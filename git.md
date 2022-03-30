@@ -94,7 +94,7 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 
 # 分支管理
 ## 创建与合并分支
-[创建与合并分支][https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424]
+[创建与合并分支](https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424)
 
 `git checkout -b dev`    创建并切换到dev分支
 
@@ -193,3 +193,6 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 ## 多人协作
 ## Rebase
 
+
+
+[https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424]: 
