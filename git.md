@@ -77,6 +77,7 @@ add SSH Key 在Key文本框里粘贴id_rsa.pub文件的内容
   *第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，*
   *还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。*
   git push origin master  把本地的master分支的最新修改推送至GitHub
+
 ### 删除远程库
 git remote rm <name>
 git remote -v 查看远程库信息  然后可根据名字删除
@@ -176,6 +177,17 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 
 ## 分支管理策略
 
+创建并切换dev分支 git checkout -b dev
+
+修改readme 并提交一个新的commit
+
+切回 master
+
+准备合并dev分支 `git merge --no-ff -m "merge with no-ff" dev` 
+
+ `--no-ff`参数，表示禁用`Fast forward`
+### 小结
+合并分支时，加上`--no-ff`参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而`fast forward`合并就看不出来曾经做过合并。
 ## Bug分支
 ## Feature分支
 ## 多人协作
