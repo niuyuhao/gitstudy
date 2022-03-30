@@ -192,7 +192,3 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 ## Feature分支
 ## 多人协作
 ## Rebase
-
-
-
-[https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424]: 
