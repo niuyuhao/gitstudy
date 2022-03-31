@@ -189,7 +189,7 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 3.git add 之后 git stash 把当前工作现场“储藏”起来 
 4.git checkout master 换回master分支 并创建 git checkout -b issue-101
 5.在issue-101分支 模拟修复bug 之后 add  commit -m "fix bug 101"
-6.切回mastergit merge --no-ff -m "merged bug fix 101" issue-101完成合并 
+6.切回master  git merge --no-ff -m "merged bug fix 101" issue-101完成合并 
   最后删除issue-101分支  git branch -d issue-101
 7.回到dev git checkout dev 通过 git stash list查看储藏的工作现场
 8. 1）一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
@@ -206,4 +206,28 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 `git branch -d feature-vulcan`         feature-vulcan分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用大写的-D参数。
 `git branch -D feature-vulcan`
 ## 多人协作
+
+`git remote -v` 显示更详细的信息
+
+```
+origin	git@github.com:niuyuhao/gitstudy (fetch)
+origin	git@github.com:niuyuhao/gitstudy (push)
+```
+上面显示了可以抓取和推送的`origin`的地址。
+### 推送分支
+`git push origin master`
+`git push origin dev`推送dev分支
+### 抓取分支
+1. 创建一个新的文件夹`git clone git@github.com:michaelliao/learngit.git`
+  当从远程库clone时，默认情况下，只能看到本地的master分支。
+  现在要在dev分支上开发，就必须创建远程origin的dev分支到本地，于是他用这个命令创建本地dev分支：`$ git checkout -b dev origin/dev`
+  现在可以在dev上继续修改，然后，时不时地把dev分支push到远程：
+  `git add xxx ; git commit -m "asdsadfasf"` `git push origin dev`
+2. 此时在另一个文件夹对同样的文件进行了修改  git add xxx    git commit -m "132154"
+  - `git push origin dev` 推送失败提交有冲突。先用git pull把最新的提交从origin/dev抓下来，然后，在本地合并，解决冲突，再推送。
+  - git pull也失败了，原因是没有指定本地dev分支与远程origin/dev分支的链接，根据提示，设置dev和origin/dev的链接：`git branch --set-upstream-to=origin/dev dev`
+  - 再  git pull成功，但是合并有冲突。[解决冲突](https://www.liaoxuefeng.com/wiki/896043488029600/900004111093344) 解决后 再提交`git commit -m "131231"`，再push  `git push origin dev`
+
+
+
 ## Rebase
