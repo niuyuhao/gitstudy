@@ -200,5 +200,10 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 ```
 
 ## Feature分支
+`git checkout -b feature-vulcan` 准备一个新的分支
+`git add vulcan.py` `git commit -m "add feature vulcan"`
+返回dev 准备合并
+`git branch -d feature-vulcan`         feature-vulcan分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用大写的-D参数。
+`git branch -D feature-vulcan`
 ## 多人协作
 ## Rebase
