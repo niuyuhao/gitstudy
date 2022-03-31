@@ -219,15 +219,29 @@ origin	git@github.com:niuyuhao/gitstudy (push)
 `git push origin dev`推送dev分支
 ### 抓取分支
 1. 创建一个新的文件夹`git clone git@github.com:michaelliao/learngit.git`
-  当从远程库clone时，默认情况下，只能看到本地的master分支。
-  现在要在dev分支上开发，就必须创建远程origin的dev分支到本地，于是他用这个命令创建本地dev分支：`$ git checkout -b dev origin/dev`
-  现在可以在dev上继续修改，然后，时不时地把dev分支push到远程：
-  `git add xxx ; git commit -m "asdsadfasf"` `git push origin dev`
+    当从远程库clone时，默认情况下，只能看到本地的master分支。
+    现在要在dev分支上开发，就必须创建远程origin的dev分支到本地，于是他用这个命令创建本地dev分支：`$ git checkout -b dev origin/dev`
+    现在可以在dev上继续修改，然后，时不时地把dev分支push到远程：
+    `git add xxx ; git commit -m "asdsadfasf"` `git push origin dev`
 2. 此时在另一个文件夹对同样的文件进行了修改  git add xxx    git commit -m "132154"
   - `git push origin dev` 推送失败提交有冲突。先用git pull把最新的提交从origin/dev抓下来，然后，在本地合并，解决冲突，再推送。
   - git pull也失败了，原因是没有指定本地dev分支与远程origin/dev分支的链接，根据提示，设置dev和origin/dev的链接：`git branch --set-upstream-to=origin/dev dev`
   - 再  git pull成功，但是合并有冲突。[解决冲突](https://www.liaoxuefeng.com/wiki/896043488029600/900004111093344) 解决后 再提交`git commit -m "131231"`，再push  `git push origin dev`
 
+多人协作的工作模式通常是这样：
 
+1. 首先，可以试图用`git push origin <branch-name>`推送自己的修改；
+2. 如果推送失败，则因为远程分支比你的本地更新，需要先用`git pull`试图合并；
+3. 如果合并有冲突，则解决冲突，并在本地提交；
+4. 没有冲突或者解决掉冲突后，再用`git push origin <branch-name>`推送就能成功！
+
+如果`git pull`提示`no tracking information`，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream-to <branch-name> origin/<branch-name>`。
+### 小结
+- 查看远程库信息，使用`git remote -v`；
+- 本地新建的分支如果不推送到远程，对其他人就是不可见的；
+- 从本地推送分支，使用`git push origin branch-name`，如果推送失败，先用`git pull`抓取远程的新提交；
+- 在本地创建和远程分支对应的分支，使用`git checkout -b branch-name origin/branch-name`，本地和远程分支的名称最好一致；
+- 建立本地分支和远程分支的关联，使用`git branch --set-upstream branch-name origin/branch-name`；
+- 从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
 
 ## Rebase
