@@ -59,6 +59,7 @@ git reflog用来查看记录的每一次命令
 2.当改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，
 第一步用命令**git reset HEAD <file>**，就回到了场景1，第二步按场景1操作。
 3.已经提交了不合适的修改到版本库时，要撤销本次提交，参考*版本回退*
+
 ## 删除文件
 git add test.txt
 git commit -m "add test.txt"
@@ -97,15 +98,10 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 [创建与合并分支](https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424)
 
 `git checkout -b dev`    创建并切换到dev分支
-
 `git checktout -b` 相当于 `git branch dev` `git checkout dev`两条命令
-
 `git branch`查看当前分支
-
 `git checkout master`切换回master分支
-
 `git merge dev`合并dev分支到当前master分支
-
 `git branch -d dev`  合并完成后，就可以删除dev分支了
 
 ```
@@ -186,13 +182,23 @@ Git支持多种协议，包括https，但ssh协议速度最快。
  `--no-ff`参数，表示禁用`Fast forward`
 ### 小结
 合并分支时，加上`--no-ff`参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而`fast forward`合并就看不出来曾经做过合并。
-## Bug分支
-<<<<<<< HEAD
+## Bug分支  3.31
+```
+1.git checkout -b dev    创建并切换到dev分支
+2.touch hello.py 模拟在分支上进行操作  此时想要去创建一个分支去修复bug 并不想提交当前分支
+3.git add 之后 git stash 把当前工作现场“储藏”起来 
+4.git checkout master 换回master分支 并创建 git checkout -b issue-101
+5.在issue-101分支 模拟修复bug 之后 add  commit -m "fix bug 101"
+6.切回mastergit merge --no-ff -m "merged bug fix 101" issue-101完成合并 
+  最后删除issue-101分支  git branch -d issue-101
+7.回到dev git checkout dev 通过 git stash list查看储藏的工作现场
+8. 1）一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+   2）另一种方式是用git stash pop，恢复的同时把stash内容也删了：
+   你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+   git stash apply stash@{0}
+9. git cherry-pick commitID 让我们能复制一个特定的提交到当前分支,避免重复劳动
+```
 
-
-
-=======
->>>>>>> origin/master
 ## Feature分支
 ## 多人协作
 ## Rebase
