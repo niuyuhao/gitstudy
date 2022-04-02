@@ -43,6 +43,7 @@ git reflog用来查看记录的每一次命令
 **HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令git reset --hard commit_id。**
 **git log可以查看提交历史，以便确定要回退到哪个版本。**
 **git reflog查看命令历史，以便确定要回到未来的哪个版本**
+
 ## 工作区和暂存区
 工作区：电脑里能看到的目录
 版本库：工作区一个隐藏的目录.git，不算工作区，而是Git的版本库
@@ -244,4 +245,48 @@ origin	git@github.com:niuyuhao/gitstudy (push)
 - 建立本地分支和远程分支的关联，使用`git branch --set-upstream branch-name origin/branch-name`；
 - 从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
 
-## Rebase
+## 01 [Rebase](https://juejin.cn/book/6844733697996881928/section/6844733698055602183)
+
+`rebase` 的意思是，给你的 `commit` 序列重新设置基础点（也就是父 `commit`）。展开来说就是，把你指定的 `commit` 以及它所在的 `commit` 串，以指定的目标 `commit` 为基础，依次重新提交一次。
+
+- 在master分支  
+  - `git checkout branch1` 
+  - `git rebase master`
+  - `git checkout master`
+  - `git merge branch1`
+
+`master 分支的 git merge xx分支 = xx分支的git rebase master + master分支 git merge xx分支`
+
+## 02 刚刚提交的代码，发现写错了怎么办
+
+`git commit --amend`可以修复当前提交的错误
+
+```
+修改之后  git add  
+git commit --amend   修复并且可以添加  -m " " 里的内容
+```
+
+需要注意的有一点：`commit --amend` 并不是直接修改原 `commit` 的内容，而是生成一条新的 `commit`。
+
+## 03 写错的不是最新的提交，而是倒数第二个？
+
+1. `git rebase -i HEAD^^`
+2. 选择 commit 和对应的操作   旧的 `commit` 会排在上面，新的排在下面。
+   - 把`pick`改成`edit`  退出
+   - 修改  ----> add  ----->  git commit --amend
+3. 修复完成之后用 `rebase --continue` 来继续 `rebase` 过程，把后面的 `commit` 直接应用上去
+
+```
+说明：在 Git 中，有两个「偏移符号」： ^ 和 ~。
+
+^的用法：在 commit 的后面加一个或多个 ^ 号，可以把 commit 往回偏移，偏移的数量是 ^ 的数量。例如：master^ 表示 master 指向的 commit 之前的那个 commit; HEAD^^ 表示 HEAD 所指向的 commit 往前数两个 commit。
+
+~ 的用法：在 commit 的后面加上 ~ 号和一个数，可以把 commit 往回偏移，偏移的数量是 ~ 号后面的数。例如：HEAD~5 表示 HEAD 指向的 commit往前数 5 个 commit。
+```
+
+## 04 比错还错，想直接丢弃刚写的提交？
+
+`**git reset --hard 目标commit**`
+
+git reset --hard HEAD^		前一个
+

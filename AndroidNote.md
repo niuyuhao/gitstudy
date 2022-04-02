@@ -125,3 +125,47 @@ IntelliJ IDEA项目自动生成的文件,我们不需要关心或修改这个文
 将会详细分析gradle构建脚本中的具体内容。
 11. proguard-rules.pro
 这个文件用于指定项目代码的混淆规则,当代码开发完成后打包成安装包文件,如果不希望代码被别人破解,通常会将代码进行混淆,从而让破解者难以阅读。
+
+```xml
+<!--这段代码表示对MainActivity进行注册,没有在AndroidManifest.xml里注册的Activity-->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <!--表示MainActivity是这个项目的主Activity,在手机上点击应用图标,首先启动的就是这个Activity-->
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+```
+
+```java
+/*
+    AppCompatActivity是AndroidX中提供的一种向下兼容的Activity,可以使Activity在不同系统版本中的功能保持一致性
+    Activity类是Android系统提供的一个基类  项目中所有自定义的Activity都必须继承它或者它的子类才能拥有Activity的特性
+    onCreate()这个方法是一个Activity被创建时必定要执行的方法
+*/
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //这个方法给当前的Activity引入了一个activity_main布局,“Hello World!”就是在这里定义的
+        //布局文件都是定义在res/layout目录下的
+        setContentView(R.layout.activity_main);
+    }
+}
+```
+
+```xml
+<!--通过android:text="Hello World!"这句代码定义的-->
+<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+```
+
+### 1.3.4 详解项目中的资源
