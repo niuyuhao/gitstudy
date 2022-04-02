@@ -286,7 +286,10 @@ git commit --amend   修复并且可以添加  -m " " 里的内容
 
 ## 04 比错还错，想直接丢弃刚写的提交？
 
-`**git reset --hard 目标commit**`
-
+**`git reset --hard 目标commit`**
 git reset --hard HEAD^		前一个
 
+## 05  想丢弃的也不是最新的提交？
+
+撤销倒数第二条commit
+`git rebase -i HEAD^^`   >  删除要撤销的commit  >  修改冲突并提交 > `git rebase --continue`
