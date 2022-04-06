@@ -69,8 +69,21 @@ rm test.txt
 git rm test.txt		git commit -m "remove test.txt"  现在，文件就从版本库中被删除了。
 2.删错了，因为版本库里还有呢，所以可以把误删的文件恢复到最新版本：
 git checkout -- test.txt
+
+# [HEAD  master 与 branch](https://juejin.cn/book/6844733697996881928/section/6844733698047213582)
+
+1. `HEAD` 是指向当前 `commit` 的引用，它具有唯一性，每个仓库中只有一个 `HEAD`。在每次提交时它都会自动向前移动到最新的 `commit` 。
+2. `branch` 是一类引用。`HEAD` 除了直接指向 `commit`，也可以通过指向某个 `branch` 来间接指向 `commit`。当 `HEAD` 指向一个 `branch` 时，`commit` 发生时，`HEAD` 会带着它所指向的 `branch` 一起移动。
+3. master是 Git 中的默认branch，它和其它branch的区别在于：
+   1. 新建的仓库中的第一个 `commit` 会被 `master` 自动指向；
+   2. 在 `git clone` 时，会自动 `checkout` 出 `master`。
+4. branch的创建、切换和删除：
+   1. 创建 `branch` 的方式是 `git branch 名称` 或 `git checkout -b 名称`（创建后自动切换）；
+   2. 切换的方式是 `git checkout 名称`；
+   3. 删除的方式是 `git branch -d 名称`。
+
 # 远程仓库
-add SSH Key 在Key文本框里粘贴id_rsa.pub文件的内容
+
 ## 添加远程库
 1.登陆GitHub，创建一个新的仓库：
 2.在Repository name填入名字
@@ -79,6 +92,12 @@ add SSH Key 在Key文本框里粘贴id_rsa.pub文件的内容
   *第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，*
   *还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。*
   git push origin master  把本地的master分支的最新修改推送至GitHub
+
+### [push本质](https://juejin.cn/book/6844733697996881928/section/6844733698047229965)
+
+1. `push` 是把当前的分支上传到远程仓库，并把这个分支的路径上的所有 `commits` 也一并上传。
+2. `push` 的时候，如果当前分支是一个本地创建的分支，需要指定远程仓库名和分支名，用 `git push origin 分支name` 的格式，而不能只用 `git push`。
+3. `push` 的时候之后上传当前分支，并不会上传 `HEAD`；远程仓库的 `HEAD` 是永远指向默认分支（即 `master`）的。
 
 ### 删除远程库
 git remote rm <name>
@@ -106,13 +125,25 @@ Git支持多种协议，包括https，但ssh协议速度最快。
 `git branch -d dev`  合并完成后，就可以删除dev分支了
 
 ```
-查看分支：git branch
+git工作区 版本库查看分支：git branch
 创建分支：git branch <name>
 切换分支：git checkout <name> 或者 git switch <name>
 创建+切换分支：git checkout -b <name>或者git switch -c <name>
 合并某分支到当前分支：git merge <name>
 删除分支：git branch -d <name>
 ```
+
+## **merge：合并commits**
+
+1. 从要合并`commit` 和当前 `commit` （即 `HEAD` 所指向的 `commit`）分叉的位置起，把要合并的 `commit` 的路径上的所有 `commit` 的内容一并应用到当前 `commit`，然后自动生成一个新的 `commit`。
+
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2017/11/21/15fddc2aad5a0279~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp" alt="分支合并" style="zoom:67%;" />
+
+2. merge场景：单独开发的 `branch` 用完了以后，合并回原先的 `branch`；
+3. merge的三种情况
+   1. 冲突
+   2. `HEAD`领先于目标commit：Git什么也不做；
+   3. `HEAD`落后于目标commit：fast-forward。
 
 ## 解决冲突
 
@@ -245,6 +276,36 @@ origin	git@github.com:niuyuhao/gitstudy (push)
 - 建立本地分支和远程分支的关联，使用`git branch --set-upstream branch-name origin/branch-name`；
 - 从远程抓取分支，使用`git pull`，如果有冲突，要先处理冲突。
 
+## [Feature Branching工作流：最流行的工作流](https://juejin.cn/book/6844733697996881928/section/6844733698051407885)
+
+这种工作流的核心内容可以总结为两点：
+
+1. 任何新的功能（feature）或 bug 修复全都新建一个 `branch` 来写；
+2. `branch` 写完后，合并到 `master`，然后删掉这个 `branch`。
+
+<img src="git/15fde6edbfe362c4tplv-t2oaga2asx-zoom-in-crop-mark1304000.webp" style="zoom:67%;" />
+
+创建一个分支 例如dev，在dev分支上进行开发工作。完成之后push到中央仓库，等其他人拉取review，确认可以合并到master分之后，合并完push之后删除分支。
+
+如果代码确认后需要修改的话，修改之后做一个新的提交，再push上去。
+
+### Pull Request
+
+Pull Request可以让团队的成员方便地讨论一个branch，并在结束之后一键合并这个`branch`和`master`。
+
+## 关于add
+
+add . 把工作目录下的所有改动全部放进暂存区
+
+add 添加的是文件的改动，而不是文件名
+
+```
+比如 先修改了xx.txt，然后将它add进了暂存区
+然后又往xx.txt里写了几行东西。此时新改动不会被添加到暂存区。
+```
+
+
+
 ## 01 [Rebase](https://juejin.cn/book/6844733697996881928/section/6844733698055602183)
 
 `rebase` 的意思是，给你的 `commit` 序列重新设置基础点（也就是父 `commit`）。展开来说就是，把你指定的 `commit` 以及它所在的 `commit` 串，以指定的目标 `commit` 为基础，依次重新提交一次。
@@ -293,3 +354,78 @@ git reset --hard HEAD^		前一个
 
 撤销倒数第二条commit
 `git rebase -i HEAD^^`   >  删除要撤销的commit  >  修改冲突并提交 > `git rebase --continue`
+
+## 06代码已经 push 上去了才发现写错？
+
+1. 出错的内容在自己的branch
+   - 把写错的从哦秘密他修改或者删除，然后再push上去
+     - 由于在本地对已有的 `commit` 做了修改，这时你再 `push` 就会失败，因为中央仓库包含本地没有的 `commit`s。此时用本地的内容覆盖掉中央仓库的内容`git push origin branch -f`  -f 是 --force的缩写，《忽略冲突，强制`push`》
+2. 出错的内容已经合并到master
+   - 在这种时候，只能选用另一种策略：增加一个新的提交，把之前提交的内容抹掉。例如之前你增加了一行代码，你希望撤销它，那么你就做一个删掉这行代码的提交；如果你删掉了一行代码，你希望撤销它，那么你就做一个把这行代码还原回来的提交。这种事做起来也不算麻烦，因为 Git 有一个对应的指令：`revert`。
+     - 希望撤销哪个`commit`,就把它填在后面：
+       - `git revert HEAD^`
+       - 上面这行代码就会增加一条新的 `commit`，它的内容和倒数第二个 `commit` 是相反的，从而和倒数第二个 `commit` 相互抵消，达到撤销的效果。
+       - 在 `revert` 完成之后，把新的 `commit` 再 `push` 上去，这个 `commit` 的内容就被撤销了。它和前面所介绍的撤销方式相比，最主要的区别是，这次改动只是被「反转」了，并没有在历史中消失掉，你的历史中会存在两条 `commit` ：一个原始 `commit` ，一个对它的反转 `commit`。
+
+## 07 reset 的本质——不止可以撤销提交
+
+**reset 的本质：移动 HEAD 以及它所指向的 branch**
+
+`reset可以撤销commit，但它的实质性为并不是撤销，而是移动HEAD，并且捎待上HEAD所指向的branch（有的话）`。它是用来重置HEAD以及它所指向的`branch`的位置的。
+
+`git reset --hard branch2` 可以把HEAD 和 branch移动到branch2
+
+**reset --hard: 重置工作目录**
+
+`reset --hard` 会在重置 `HEAD` 和 `branch` 的同时，重置工作目录里的内容。当你在 `reset` 后面加了 `--hard` 参数时，你的工作目录里的内容会被完全重置为和 `HEAD` 的新位置相同的内容。换句话说，就是你的未提交的修改会被全部擦掉。
+
+1. 在一次`commit`之后,进行修改
+2. 执行`git  reset --hard HEAD^`之后，HEAD 和 当前 branch切到上一条commit的同时，工作目录里的新改动也一起全都消失了，不管是否被放进暂存区。
+
+**reset --soft: 保留工作目录**
+
+`reset --soft` 会在重置 `HEAD` 和 `branch` 时，保留工作目录和暂存区中的内容，并把重置 `HEAD` 所带来的新的差异放进暂存区。
+
+`--hard` 会清空工作目录的改动，而 `--soft` 则会保留工作目录的内容，并把因为保留工作目录内容所带来的新的文件差异放进暂存区。
+
+**reset 不加参数：保留工作目录，并清空暂存区**
+
+`reset` 如果不加参数，那么默认使用 `--mixed` 参数。它的行为是：**保留工作目录，并且清空暂存区。**
+
+```
+--hard：重置位置的同时，清空工作目录的所有改动；
+--soft：重置位置的同时，保留工作目录和暂存区的内容，并把重置 HEAD 的位置所导致的新的文件差异放进暂存区。
+--mixed（默认）：重置位置的同时，保留工作目录的内容，并清空暂存区。
+```
+
+## 08 checkout的本质
+
+实质上，`checkout` 并不止可以切换 `branch`。`checkout` 本质上的功能其实是：
+把 `HEAD` 指向指定的 `branch`，然后签出这个 `branch` 所对应的 `commit` 的工作目录。所以不止可以切换branch，也可以直接指定`commit`作为参数，来把HEAD移动到指定的`commit`
+
+### checkout和reset的不同
+
+`reset` 在移动 `HEAD` 时会带着它所指向的 `branch` 一起移动，而 `checkout` 不会。当你用 `checkout` 指向其他地方的时候，`HEAD` 和 它所指向的 `branch` 就自动脱离了。
+
+`git checkout --detach`
+
+执行这行代码，Git 就会把 `HEAD` 和 `branch` 脱离，直接指向当前 `commit`：
+
+## 09 stash 临时存放工作目录的改动
+
+参考Bug分支3.31
+
+## 10branch 删过了才想起来有用？
+
+`git reflog` 查看branch被删除之前的位置的commit。
+
+`git checkout commit`
+
+`git checkout -b branch`再重新创建回来
+
+`reflog` 默认查看 `HEAD` 的移动历史，除此之外，也可以手动加上名称来查看其他引用的移动历史，例如某个 `branch`：
+
+git reflog master
+
+## 忽略文件
+
