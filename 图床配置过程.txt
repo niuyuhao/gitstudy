@@ -38,6 +38,8 @@ https://github.com/Molunerfinn/PicGo/releases/tag/v2.3.0  PicGo下载
 https://ywnz.com/linuxrj/2788.html  如何运行PicGo
 https://blog.csdn.net/qq_42584874/article/details/116534328  Typora + PicGo + 腾讯云配置
 
+https://imgconvert.csdnimg.cn/aHR0cHM6Ly9waWNiZWQtMTI1MTYyMjQyNi5jb3MuYXAtYmVpamluZy5teXFjbG91ZC5jb20vcGljX2JlZF9pbWcvaW1hZ2UtMjAyMDA4MjcxMDQ2MTgyNjkucG5n?x-oss-process=image/format,png  typora配置
+
 https://blog.csdn.net/guo_ridgepole/article/details/108257277?spm=1001.2101.3001.6650.6&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-6.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-6.pc_relevant_default 参考修改的配置文件信息
 
 

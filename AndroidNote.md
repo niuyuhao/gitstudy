@@ -16,7 +16,7 @@ Android系统是基于Linux内核的,这一层为Android设备的各种硬件提
 所有安装在手机上的应用程序都是属于这一层的,比如系统自带的联系人、短信等程序,
 或者是你从Google Play上下载的小游戏,当然还包括你自己开发的程序。
 
-<img src="/home/ts/snap/typora/58/.config/Typora/typora-user-images/image-20220331161352665.png" alt="image-20220331161352665" style="zoom: 67%;" />
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407094625300.png" alt="image-20220407094625300" style="zoom:67%;" />
 
 ### 1.1.2  Android已发布的版本
 
@@ -65,11 +65,11 @@ http://www.android-studio.org/
 任何一个新建的项目都会默认使用Android模式的项目结构,但这并不是项目真实的目录结构,
 而是被Android Studio转换过的。
 
-<img src="/home/ts/snap/typora/58/.config/Typora/typora-user-images/image-20220331175442230.png" alt="image-20220331175442230" style="zoom:50%;" />
+
 
 **Project模式的项目结构**
 
-<img src="/home/ts/snap/typora/58/.config/Typora/typora-user-images/image-20220331175546815.png" alt="image-20220331175546815" style="zoom:50%;" />
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407094821316.png" alt="image-20220407094821316" style="zoom:67%;" />
 
 1. .gradle和.idea
    这两个目录下放置的都是Android Studio自动生成的一些文件,无须关心,也不要去手动编辑。
@@ -98,7 +98,7 @@ http://www.android-studio.org/
 
 #### app目录结构
 
-<img src="/home/ts/snap/typora/58/.config/Typora/typora-user-images/image-20220331180354971.png" alt="image-20220331180354971" style="zoom: 67%;" />
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407094900195.png" alt="image-20220407094900195" style="zoom:67%;" />
 
 01. build
 这个目录和外层的build目录类似,也包含了一些在编译时自动生成的文件,不过它里面的内容会更加复杂,我们不需要过多关心。
@@ -170,4 +170,4 @@ public class MainActivity extends AppCompatActivity {
 
 ### 1.3.4 详解项目中的资源
 
-<img src="../../%E5%9B%BE%E7%89%87/image-20220407093429045.png" alt="image-20220407093429045" style="zoom:50%;" />
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407094452473.png" alt="image-20220407094452473" style="zoom:50%;" />
