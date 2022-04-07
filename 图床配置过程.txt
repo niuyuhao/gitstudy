@@ -1,0 +1,45 @@
+==============================================配置文件=============================================
+{
+  "picBed": {
+    "current": "tcyun",
+    //"uploader": "tcyun",
+    //"smms": { "token": "" },
+    /*"tcyun": {
+      "appId": "1256524210",
+      "area": "ap-shanghai",
+      "bucket": "xingqiu-tuchuang-1256524210",
+      "customUrl": "",
+      "path": "365/",
+      "secretId": "AKIDb0B7nDOJzPaVBbmhNnzwd5HDuLXT9alg",
+      "secretKey": "h9LHyPaWCcmhMlvpUt3yykGXYJo44oJY",
+      "version": "v5"*/
+  },
+  "picgoPlugins": {}
+}
+{
+	"picBed": {
+		"current": "tcyun",
+		"tcyun": {
+			"secretId": "填入记下来的accessKey",
+			"secretKey": "填入记下来的secretKey",
+			"bucket": "填入创建的存储桶名称",
+			"appId": "",
+			"area": "填写创建的存储桶的地域",
+			"path": "自定义存储路径，比如 img/ 或者 /img/,如果不填写则会默认存储在根目录",
+			"customUrl": "这里填写访问域名，即url地址",
+			"version": "v5"
+		}
+	},
+	"picgoPlugins": {}
+}
+==============================================配置参考=============================================
+https://zhuanlan.zhihu.com/p/440800482  
+https://github.com/Molunerfinn/PicGo/releases/tag/v2.3.0  PicGo下载
+https://ywnz.com/linuxrj/2788.html  如何运行PicGo
+https://blog.csdn.net/qq_42584874/article/details/116534328  Typora + PicGo + 腾讯云配置
+
+https://blog.csdn.net/guo_ridgepole/article/details/108257277?spm=1001.2101.3001.6650.6&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-6.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-6.pc_relevant_default 参考修改的配置文件信息
+
+
+
+
