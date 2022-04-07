@@ -1,22 +1,5 @@
 ==============================================配置文件=============================================
 {
-  "picBed": {
-    "current": "tcyun",
-    //"uploader": "tcyun",
-    //"smms": { "token": "" },
-    /*"tcyun": {
-      "appId": "1256524210",
-      "area": "ap-shanghai",
-      "bucket": "xingqiu-tuchuang-1256524210",
-      "customUrl": "",
-      "path": "365/",
-      "secretId": "AKIDb0B7nDOJzPaVBbmhNnzwd5HDuLXT9alg",
-      "secretKey": "h9LHyPaWCcmhMlvpUt3yykGXYJo44oJY",
-      "version": "v5"*/
-  },
-  "picgoPlugins": {}
-}
-{
 	"picBed": {
 		"current": "tcyun",
 		"tcyun": {

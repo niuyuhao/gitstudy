@@ -318,16 +318,18 @@ add 添加的是文件的改动，而不是文件名
 
 `master 分支的 git merge xx分支 = xx分支的git rebase master + master分支 git merge xx分支`
 
-## 02 刚刚提交的代码，发现写错了怎么办
+### [rebase和merge的区别](https://blog.csdn.net/michaelshare/article/details/79108233)
 
-`git commit --amend`可以修复当前提交的错误
+1. merge能够体现出时间线，但是rebase会打乱时间线。
+2. 而rebase看起来简洁，但是merge看起来不太简洁。
+3. 最终结果是都把代码合起来了
 
-```
-修改之后  git add  
-git commit --amend   修复并且可以添加  -m " " 里的内容
-```
+## 02 commit之后发现错误的修复
 
-需要注意的有一点：`commit --amend` 并不是直接修改原 `commit` 的内容，而是生成一条新的 `commit`。
+1. git reset --hard HEAD^` 回退到上一个commit
+2. `git commit --amend`可以修复当前提交的错误
+   - 直接进行修改之后`git add`   然后使用`git commit --amend`
+   - 需要注意的有一点：`commit --amend` 并不是直接修改原 `commit` 的内容，而是会把当前一次 `commit` 里的内容和暂存区里的内容合并起来后创建一个新的 `commit`，**用这个新的 `commit` 把当前 `commit` 替换掉**。
 
 ## 03 写错的不是最新的提交，而是倒数第二个？
 
@@ -336,6 +338,8 @@ git commit --amend   修复并且可以添加  -m " " 里的内容
    - 把`pick`改成`edit`  退出
    - 修改  ----> add  ----->  git commit --amend
 3. 修复完成之后用 `rebase --continue` 来继续 `rebase` 过程，把后面的 `commit` 直接应用上去
+   - `git log --pretty==oneline` 查看到倒数第二个已被修改
+
 
 ```
 说明：在 Git 中，有两个「偏移符号」： ^ 和 ~。
@@ -355,10 +359,18 @@ git reset --hard HEAD^		前一个
 撤销倒数第二条commit
 `git rebase -i HEAD^^`   >  删除要撤销的commit  >  修改冲突并提交 > `git rebase --continue`
 
-## 06代码已经 push 上去了才发现写错？
+2. `git rebase --onto`
+   - <img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2017/11/22/15fe24400d7d73d0~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp" style="zoom:50%;" />
+   - `git rebase --onto 第3个commit 第4个commit branch1`
+     - `--onto` 参数后面三个附加参数：目标 `commit`、起点 `commit`（注意：rebase 的时候会把起点排除在外）、终点 `commit`。所以上面这行指令就会从 `4` 往下数，拿到 `branch1` 所指向的 `5`，然后把 `5` 重新提交到 `3` 上去。
+   - `git rebase --onto HEAD^^ HEAD^ branch1`
+     - 以倒数第二个 `commit` 为起点（起点不包含在 `rebase` 序列），`branch1` 为终点，`rebase` 到倒数第三个 `commit` 上。
+     - <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/15fe243fce5804fd~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp" style="zoom: 50%;" />
+
+## 06 push之后发现错误的修复
 
 1. 出错的内容在自己的branch
-   - 把写错的从哦秘密他修改或者删除，然后再push上去
+   - 把写错的commit修改或者删除，然后再push上去
      - 由于在本地对已有的 `commit` 做了修改，这时你再 `push` 就会失败，因为中央仓库包含本地没有的 `commit`s。此时用本地的内容覆盖掉中央仓库的内容`git push origin branch -f`  -f 是 --force的缩写，《忽略冲突，强制`push`》
 2. 出错的内容已经合并到master
    - 在这种时候，只能选用另一种策略：增加一个新的提交，把之前提交的内容抹掉。例如之前你增加了一行代码，你希望撤销它，那么你就做一个删掉这行代码的提交；如果你删掉了一行代码，你希望撤销它，那么你就做一个把这行代码还原回来的提交。这种事做起来也不算麻烦，因为 Git 有一个对应的指令：`revert`。
@@ -366,6 +378,8 @@ git reset --hard HEAD^		前一个
        - `git revert HEAD^`
        - 上面这行代码就会增加一条新的 `commit`，它的内容和倒数第二个 `commit` 是相反的，从而和倒数第二个 `commit` 相互抵消，达到撤销的效果。
        - 在 `revert` 完成之后，把新的 `commit` 再 `push` 上去，这个 `commit` 的内容就被撤销了。它和前面所介绍的撤销方式相比，最主要的区别是，这次改动只是被「反转」了，并没有在历史中消失掉，你的历史中会存在两条 `commit` ：一个原始 `commit` ，一个对它的反转 `commit`。
+       - ![image-20220407152500788](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407152500788.png)
+       - 删除的test又恢复了
 
 ## 07 reset 的本质——不止可以撤销提交
 
@@ -411,21 +425,83 @@ git reset --hard HEAD^		前一个
 
 执行这行代码，Git 就会把 `HEAD` 和 `branch` 脱离，直接指向当前 `commit`：
 
-## 09 stash 临时存放工作目录的改动
+## 09 stash 临时存放工作目录的改动（编码时候需要紧急切换分支如何操作。）
 
-参考Bug分支3.31
+```
+1.git checkout -b dev    创建并切换到dev分支
+2.touch hello.py 模拟在分支上进行操作  此时需要紧急创建切换一个分支     但是又不想提交当前操作的分支
+3.git add 之后 git stash 把当前工作现场“储藏”起来 
+4.git checkout master 换回master分支 并创建 git checkout -b branch
+5.在branch分支  模拟一番操作 之后 add  commit -m "紧急切换分支的操作"
+6.切回master  git merge --no-ff -m "merged branch" branch完成合并 
+  最后删除branch分支  git branch -d branch
+7.回到dev git checkout dev 通过 git stash list查看储藏的工作现场
+8. 1）一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+   2）另一种方式是用git stash pop，恢复的同时把stash内容也删了：
+   你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+   git stash apply stash@{0}
+9. git cherry-pick commitID 让我们能复制一个特定的提交到当前分支,避免重复劳动
+```
 
-## 10branch 删过了才想起来有用？
+[参考链接](https://www.liaoxuefeng.com/wiki/896043488029600/900388704535136)
+
+## 10 错误删除branch后恢复有用代码
 
 `git reflog` 查看branch被删除之前的位置的commit。
 
+![image-20220407154023116](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407154023116.png)
+
 `git checkout commit`
 
-`git checkout -b branch`再重新创建回来
+![image-20220407154218315](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407154218315.png)
+
+`git checkout -b branch`再重新创建回来  在dev分支上创建的d.txt也恢复了
+
+![image-20220407154343567](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407154343567.png)
 
 `reflog` 默认查看 `HEAD` 的移动历史，除此之外，也可以手动加上名称来查看其他引用的移动历史，例如某个 `branch`：
 
-git reflog master
+git reflog master**（对这个移动历史存在疑问）**
 
 ## 忽略文件
+
+配置忽略文件内容
+
+```.gitignore
+
+# Gradle files
+.gradle/
+build/
+# Local configuration file (sdk path, etc)
+local.properties
+# Log/OS Files
+*.log
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+output.json
+# IntelliJ
+*.iml
+.idea/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+# Keystore files
+*.jks
+*.keystore
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+# Android Profiling
+*.hprof
+# zidingyi
+gradle
+build.gradle
+gradle.properties
+gradlew
+gradlew.bat
+local.properties
+settings.gradle
+```
 
