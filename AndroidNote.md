@@ -169,3 +169,5 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 ### 1.3.4 详解项目中的资源
+
+<img src="../../%E5%9B%BE%E7%89%87/image-20220407093429045.png" alt="image-20220407093429045" style="zoom:50%;" />
