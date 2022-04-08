@@ -170,4 +170,91 @@ public class MainActivity extends AppCompatActivity {
 
 ### 1.3.4 详解项目中的资源
 
-<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220407094452473.png" alt="image-20220407094452473" style="zoom:50%;" />
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408102600570.png" alt="image-20220408102600570" style="zoom:67%;" />
+
+所有以“drawable”开头的目录都是用来放图片的
+
+所有以“layout”开头的目录都是用来放布局文件的。
+
+所有以“mipmap”开头的目录都是用来放应用图标的
+
+所有以“values”开头的目录都是用来放字符串、样式、颜色等配置的
+
+```
+有这么多“mipmap”开头的目录,主要是为了让程序能够更好地兼容各种设备。drawable目录也是相同的道理,虽然Android Studio没有帮我们自动生成,但是我们应该自己创建drawable-hdpi、drawable-xhdpi、drawable-xxhdpi等目录。在制作程序的时候,最好能够给同一张图片提供几个不同分辨率的版本,分别放在这些目录下,然后程序运行的时候,会自动根据当前运行设备分辨率的高低选择加载哪个目录下的图片。当然这只是理想情况,更多的时候美工只会提供给我们一份图片,这时你把所有图片都放在drawable-xxhdpi目录下就好了,因为这是最主流的设备分辨率目录。
+```
+
+res/values/strings.xml文件,内容
+
+![](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408104524715.png)
+
+这里定义了一个应用程序名的字符串,可以用下面两种方式来引用它。
+
+- 在代码中通过R.string.app_name可以获得该字符串的引用。
+  - ![image-20220408145443259](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408145443259.png)
+- 在XML中通过@string/app_name可以获得该字符串的引用。
+  - ![image-20220408145909206](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408145909206.png)label 处字样为项目名称
+
+基本的语法就是两种方式,其中string部分是可以替换的,引用图片资源就替换成R.drawable
+
+引用应用图标可以替换成mipmap,引用布局文件就可以替换成layout,以此类推。
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408155354552.png" alt="image-20220408155354552" style="zoom: 67%;" />
+
+应用图标就是通过android:icon属性指定的,应用的名称则是通过android:label属性指定的。
+
+这里对资源引用的方式正是在XML中引用资源的语法。
+
+### 1.3.5 详解build.gradle文件（没明白）
+Android Studio是采用Gradle来构建项目的。Gradle是一个非常先进的项目构建工具,它使用了一种基于Groovy的领域特定语言(DSL)来进行项目设置,摒弃了传统基于XML(如Ant和Maven)的各种烦琐配置。
+在1.3.3HelloWorld项目中有两个build.gradle文件,一个是在最外层目录下的,一个是在app目录下的。这两个文件对构建Android Studio项目都起到了重要的作用,下面是对这两个文件中的内容分析。
+
+## 1.4 日志工具的使用
+
+### 1.4.1 使用Android的日志工具Log
+Android中的日志工具类是Log(android.util.Log),这个类中提供了如下5个方法来供我们打印日志。
+
+- Log.v()。用于打印那些最为琐碎的、意义最小的日志信息。对应级别verbose,是Android日志里面级别最低的一种。
+- Log.d()。用于打印一些调试信息,这些信息对你调试程序和分析问题应该是有帮助的。对应级别debug,比verbose高一级。
+- Log.i()。用于打印一些比较重要的数据,这些数据应该是你非常想看到的、可以帮你分析用户行为的数据。对应级别info,比debug高一级。
+- Log.w()。用于打印一些警告信息,提示程序在这个地方可能会有潜在的风险,最好去修复一下这些出现警告的地方。对应级别warn,比info高一级。
+- Log.e()。用于打印程序中的错误信息,比如程序进入了catch语句中。当有错误信息打印出来的时候,一般代表你的程序出现严重问题了,必须尽快修复。对应级别error,比warn高一级。
+
+一共就5个方法,每个方法还会有不同的重载。
+
+![image-20220408165735810](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408165735810.png)
+
+Log.d()方法中传入了两个参数:第一个参数是tag,一般传入当前的类名就好,主要用于对打印信息进行过滤;第二个参数是msg,即想要打印的具体内容。
+重新运行项目。等程序运行完毕,在Logcat中就可以看到打印信息了。
+
+![image-20220408165944571](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408165944571.png)
+
+### 1.4.2 为什么使用Log而不使用println()
+
+首先,Logcat中可以很轻松地添加过滤器,可以在图中看到我们目前所有的过滤器。
+
+![image-20220408171004830](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408171004830.png)
+
+目前只有3个过滤器,Show only selected application表示只显示当前选中程序的日志;
+Firebase是Google提供的一个开发者工具和基础架构平台,可以不用管它;
+
+No Filters相当于没有过滤器,会把所有的日志都显示出来。
+
+添加一个自定义过滤器
+
+点击“Edit Filter Configuration”,会弹出一个过滤器配置界面。我们给过滤器起
+名叫data,并且让它对名为data的tag进行过滤
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408171309092.png" alt="image-20220408171309092" style="zoom: 67%;" />
+
+点击“OK”,多出一个data过滤器。当选中这个过滤器的时候,刚才在onCreate()方法里打印的日志就不见了,这是因为data这个过滤器只会显示tag名称为data的日志。在onCreate()方法中把打印日志的语句改成Log.d("data","==========onCreate execute============"),然后再次运行程序,就会在data过滤器下看到这行日志了。
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408171807542.png" alt="image-20220408171807542" style="zoom:67%;" />
+
+Logcat中的日志级别控制。Logcat中主要有5个级别,分别对应上一小节介绍的5个方法。
+
+![image-20220408171847493](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220408171847493.png)
+
+当选中的级别是Verbose,也就是最低等级。这意味着不管使用哪一个方法打印日志,这条日志都一定会显示出来。而将级别选中为Debug,这时只有我们使用Debug及以上级别方法打印的日志才会显示出来,以此类推。
+
+当把Logcat中的级别选中为Info、Warn或者Error时,在onCreate()方法中打印的语句会显示,因为打印日志时使用的是Log.d()方法。
