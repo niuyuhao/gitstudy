@@ -842,3 +842,10 @@ protected void onActivityResult(int requestCode, int resultCode, @Nullable Inten
 ### 3.4.4 体验Activity的生命周期
 
 ### 3.4.5 Activity被回收了怎么办
+
+``两个可能会用到的网站``
+
+[解决Android Studio报The emulator process for AVD Pixel_4a_Edited_API_28 has terminated.类似错误 - Tireless - 博客园 (cnblogs.com)](https://www.cnblogs.com/a001jingzhao/p/15211160.html)
+
+[(57条消息) 对于Android虚拟机启动失败“The emulator process for AVD Nexus_5X_API_30 was killed”的解决方案_卉卉今天喝水了吗的博客-CSDN博客](https://blog.csdn.net/weixin_46523794/article/details/116156366)
+
