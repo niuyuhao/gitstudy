@@ -501,9 +501,8 @@ button1.setOnClickListener(new View.OnClickListener() {
 ### 3.3.1 使用显式 Intent
 再快速地创建一个Activity。右击com.example.activitytest→New→Activity→Empty Activity,命名为SecondActivity,并勾选Generate Layout File,给布局文件起名为second_layout,但不要勾选Launcher Activity选项
 
-点击“Finish”完成创建,Android Studio会为我们自动生成SecondActivity.java和
-second_layout.xml这两个文件。
-这里我们还是使用比较熟悉的LinearLayout,编辑second_layout.xml,将里面的代码替换成如下内容:
+点击“Finish”完成创建,Android Studio会自动生成SecondActivity.java和second_layout.xml这两个文件。
+这里还是使用的LinearLayout,编辑second_layout.xml,将里面的代码替换成如下内容:
 
 ```xml
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -542,11 +541,10 @@ public class SecondActivity extends AppCompatActivity {
 
 由于SecondActivity不是主Activity,因此不需要配置<intent-filter>标签里的内容,。
 
-**Intent是Android程序中各组件之间进行交互的一种重要方式**,它不仅可以指明当前组件想要执行的动作,还可以在不同组件之间传递数据。Intent一般可用于**启动Activity（本次做的）**、启动Service以及发送广播等场景。
+**Intent是Android程序中各组件之间进行交互的一种重要方式,它不仅可以指明当前组件想要执行的动作,还可以在不同组件之间传递数据**。Intent一般可用于**启动Activity（本次做的）**、启动Service以及发送广播等场景。
 Intent大致可以分为两种:显式Intent和隐式Intent。我们先来看一下显式Intent如何使用。
 
-Intent有多个构造函数的重载,其中一个是Intent(Context packageContext, Class<?
-cls)。这个构造函数接收两个参数:
+Intent有多个构造函数的重载,其中一个是Intent(Context packageContext, Class<?> cls)。这个构造函数接收两个参数:
 
 第一个参数Context要求提供一个启动Activity的上下文;
 
@@ -556,10 +554,10 @@ cls)。这个构造函数接收两个参数:
 
 ```java
 @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(FirstActivity.this, SecondActivity.class);
-                startActivity(intent);
-            }
+public void onClick(View view) {
+    Intent intent = new Intent(FirstActivity.this, SecondActivity.class);
+    startActivity(intent);
+}
 ```
 
 `首先new了一个Intent，传入FirstActivity.this作为上下文，传入SecondActivity.class作为目标Activity，这样做的目的是在FirstActivity这个活动的基础上打开SecondActivity。然后通过startActivity（）方法执行这个Intent`
@@ -568,11 +566,8 @@ cls)。这个构造函数接收两个参数:
 
 ### 3.3.2 使用隐式Intent
 
-相比于显式Intent,隐式Intent则含蓄了许多,它并不明确指出想要启动哪一个Activity,而是
-指定了一系列更为抽象的action和category等信息,然后交由系统去分析这个Intent,并帮
-我们找出合适的Activity去启动。
-什么叫作合适的Activity?简单来说就是可以响应这个隐式Intent的Activity,目前
-SecondActivity可以响应什么样的隐式Intent，通过在<activity>标签下配置<intent-filter>的内容,可以指定当前Activity能够响应的action和category,打开AndroidManifest.xml,添加如下代码:
+隐式Intent并不明确指出想要启动哪一个Activity,而是指定了一系列更为抽象的action和category等信息,然后交由系统去分析这个Intent,并找出合适的Activity去启动。
+什么叫作合适的Activity?简单来说就是可以响应这个隐式Intent的Activity,目前SecondActivity可以响应什么样的隐式Intent，通过在``<activity>``标签下配置``<intent-filter>``的内容,可以指定当前Activity能够响应的action和category,打开AndroidManifest.xml,添加如下代码:
 
 ```xml
 <activity
@@ -585,46 +580,42 @@ SecondActivity可以响应什么样的隐式Intent，通过在<activity>标签�
 </activity>
 ```
 
-在<action>标签中我们指明了当前Activity可以响应
-com.nyh.activitytest.ACTION_START这个action,而<category>标签则包含了
-一些附加信息,更精确地指明了当前Activity能够响应的Intent中还可能带有的category。**只
-有<action>和<category>中的内容同时匹配Intent中指定的action和category时,这个
-Activity才能响应该Intent。**
+在``<action>``标签中指明了当前Activity可以响应com.nyh.activitytest.ACTION_START这个action,而``<category>``标签则包含了一些附加信息,更精确地指明了当前Activity能够响应的Intent中还可能带有的category。**只有``<action>``和``<category>``中的内容同时匹配Intent中指定的action和category时,这个Activity才能响应该Intent。**
 
 修改FirstActivity中按钮的点击事件
 
 ```java
 button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent("com.nyh.activitytest.ACTION_START");
-                startActivity(intent);
-            }
-        });
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent("com.nyh.activitytest.ACTION_START");
+        startActivity(intent);
+    }
+});
 ```
 
-使用了Intent的另一个构造函数,直接将action的字符串传了进去,表明想要启动能够响应com.example.activitytest.ACTION_START这个action的Activity。
-这里因为android.intent.category.DEFAULT是一种默认的category,在调用startActivity()方法的时候会自动将这个category添加到Intent中。重新运行程序,在FirstActivity的界面点击一下按钮,你同样成功启动SecondActivity了。不同的是这次使用隐式Intent的方式来启动的,说明在<activity>标签下配置的action和category的内容已经生效了!每个Intent中只能指定一个action,但能指定多个category。再来增加一个。
+使用了Intent的另一个构造函数,直接将action的字符串传了进去,表明想要启动能够响应``com.example.activitytest.ACTION_START``这个action的Activity。
+这里因为android.intent.category.DEFAULT是一种默认的category,在**调用startActivity()方法的时候会自动将这个category添加到Intent中**。重新运行程序,在FirstActivity的界面点击一下按钮,同样成功启动SecondActivity了。不同的是这次使用隐式Intent的方式来启动的,说明在``<activity>``标签下配置的action和category的内容已经生效了!每个Intent中只能指定一个action,但能指定多个category。再来增加一个。
 修改FirstActivity中按钮的点击事件,代码如下:
 
 ```java
 button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent("com.nyh.activitytest.ACTION_START");
-                //可以调用Intent中的addCategory()方法来添加一个category
-                //定了一个自定义的category,值为com.nyh.activitytest.MY_CATEGORY。
-                intent.addCategory("com.nyh.activitytest.MY_CATEGORY");
-                startActivity(intent);
-            }
-        });
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent("com.nyh.activitytest.ACTION_START");
+        //可以调用Intent中的addCategory()方法来添加一个category
+        //定了一个自定义的category,值为com.nyh.activitytest.MY_CATEGORY。
+        intent.addCategory("com.nyh.activitytest.MY_CATEGORY");
+        startActivity(intent);
+    }
+});
 ```
 
 现在重新运行程序,在FirstActivity的界面点击一下按钮,报错了。在Logcat界面查看错误日志,看到如图所示错误信息。
 
 ![image-20220411144715232](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220411144715232.png)
 
-错误信息表明没有任何一个Activity可以响应定义的Intent。这是因为Intent中新增了一个category,而SecondActivity的<intent-filter>标签中并没有声明可以响应这个category,所以就出现了没有任何Activity可以响应该Intent的情况。现在在<intent-filter>中再添加一个category的声明,如下所示:
+错误信息表明没有任何一个Activity可以响应定义的Intent。这是因为Intent中新增了一个category,而SecondActivity的``<intent-filter>``标签中并没有声明可以响应这个category,所以就出现了没有任何Activity可以响应该Intent的情况。现在在``<intent-filter>``中再添加一个category的声明,如下所示:
 
 ```xml
 <activity android:name=".SecondActivity" >
@@ -638,6 +629,19 @@ button1.setOnClickListener(new View.OnClickListener() {
 ```
 
 重新运行程序,一切正常。
+
+#### 问题
+
+```xml
+<action android:name="com.nyh.activitytest.ACTION_START" />
+<category android:name="android.intent.category.DEFAULT" />
+```
+
+action  category是什么？怎么用？不用会怎么样？
+
+是标签，用于指明当前Activity可以响应``com.nyh.activitytest.ACTION_START``这个action,
+
+``<category>``也是标签，用于更精确地指明当前Activity能够响应的Intent中还可能带有的category。
 
 ### 3.3.3 更多隐式Intent的用法
 
@@ -658,7 +662,7 @@ startActivity(intent);
 重新运行程序在FirstActivity界面点击按钮就可以看到打开了系统浏览器。
 
 setData()这个方法接收一个Uri对象,主要用于指定当前Intent正在操作的数据,而这些数据通常是以字符串形式传入Uri.parse()方法中解析产生的。
-与此对应,我们还可以在<intent-filter>标签中再配置一个<data>标签,用于更精确地指定当前Activity能够响应的数据。<data>标签中主要可以配置以下内容。
+与此对应,我们还可以在``<intent-filter>``标签中再配置一个``<data>``标签,用于更精确地指定当前Activity能够响应的数据。``<data>``标签中主要可以配置以下内容。
 
 - android:scheme。用于指定数据的协议部分,如上例中的https部分。
 - android:host。用于指定数据的主机名部分,如上例中的www.baidu.com部分。
@@ -666,7 +670,7 @@ setData()这个方法接收一个Uri对象,主要用于指定当前Intent正在�
 - android:path。用于指定主机名和端口之后的部分,如一段网址中跟在域名之后的内容。
 - android:mimeType。用于指定可以处理的数据类型,允许使用通配符的方式进行指定。
 
-只有当<data>标签中指定的内容和Intent中携带的Data完全一致时,当前Activity才能够响应该Intent。不过,在<data>标签中一般不会指定过多的内容。例如在上面的浏览器示例中,其实只需要指定android:scheme为https,就可以响应所有https协议的Intent了。
+只有当``<data>``标签中指定的内容和Intent中携带的Data完全一致时,当前Activity才能够响应该Intent。不过,在``<data>``标签中一般不会指定过多的内容。例如在上面的浏览器示例中,其实只需要指定android:scheme为https,就可以响应所有https协议的Intent了。
 
 通过自己建立一个Activity,让它也能响应打开网页的Intent
 
@@ -724,15 +728,15 @@ Intent在启动Activity的时候还可以传递数据
 
 ```java
 button1.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-              String data = "Hello SecondActivity";
-              //显式Intent方式启动SecondActivity
-              Intent intent = new Intent(FirstActivity.this,SecondActivity.class);
-              //通过putExtra()方法传递参数 第一个参数为key  第二个为要传递的数据
-              intent.putExtra("extra_data",data);
-              startActivity(intent);
-        }
+    @Override
+    public void onClick(View view) {
+        String data = "Hello SecondActivity";
+        //显式Intent方式启动SecondActivity
+        Intent intent = new Intent(FirstActivity.this,SecondActivity.class);
+        //通过putExtra()方法传递参数 第一个参数为key  第二个为要传递的数据
+        intent.putExtra("extra_data",data);
+        startActivity(intent);
+    }
 });
 ```
 
@@ -763,35 +767,35 @@ startActivityForResult()方法接收两个参数，第一个参数还是Intent,�
 修改FirstActivity中按钮的点击事件，代码如下所示：
 
  ```java
- 	  @Override
-       public void onClick(View view) {
-           Intent intent = new Intent(FirstActivity.this,SecondActivity.class);
-           //用于启动SecondActivity，请求码只要是一个唯一值就可以。
-           startActivityForResult(intent,1);
+ @Override
+ public void onClick(View view) {
+     Intent intent = new Intent(FirstActivity.this,SecondActivity.class);
+     //用于启动SecondActivity，请求码只要是一个唯一值就可以。
+     startActivityForResult(intent,1);
  ```
 
 在SecondActivity中给按钮注册点击事件，并在点击事件中添加返回数据的逻辑
 
 ```java
 @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.second_layout);
-        Button button2 = (Button) findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //仅用于传递数据
-                Intent intent = new Intent();
-                intent.putExtra("data_return","Hello FirstActivity");
-                //setResult()方法专门用于向上一个活动返回数据的;
-                //两个参数： 第一个参数用于向上一个活动返回处理结果，一般只使用RESULT_OK或RESULT_CANCELED这两个值
-                //第二个参数则把带有数据的Intent传递回去
-                setResult(RESULT_OK,intent);
-                finish(); //销毁当前活动
-            }
-        });
-    }  
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.second_layout);
+    Button button2 = (Button) findViewById(R.id.button2);
+    button2.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            //仅用于传递数据
+            Intent intent = new Intent();
+            intent.putExtra("data_return","Hello FirstActivity");
+            //setResult()方法专门用于向上一个活动返回数据的;
+            //两个参数： 第一个参数用于向上一个活动返回处理结果，一般只使用RESULT_OK或RESULT_CANCELED这两个值
+            //第二个参数则把带有数据的Intent传递回去
+            setResult(RESULT_OK,intent);
+            finish(); //销毁当前活动
+        }
+    });
+}  
 ```
 
 由于是用startActivityForResult()方法启动的SecondActivity，在SecondActivity被销毁之后会回调上一个活动的onActivityResult()方法。重写该方法 来获取返回的数据
@@ -828,12 +832,12 @@ protected void onActivityResult(int requestCode, int resultCode, @Nullable Inten
 
 ```JAVA
 @Override
-    public void onBackPressed() {
-        Intent intent = new Intent();
-        intent.putExtra("data_return","Hello FirstActivity");
-        setResult(RESULT_OK,intent);
-        finish();
-    }
+public void onBackPressed() {
+    Intent intent = new Intent();
+    intent.putExtra("data_return","Hello FirstActivity");
+    setResult(RESULT_OK,intent);
+    finish();
+}
 ```
 
 ## 3.4 Activity的生命周期
@@ -1239,8 +1243,7 @@ protected void onDestroy() {
 
 ![singleTask模式下的打印日志](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220412150409056.png)
 
-在SecondActivity中启动FirstActivity时,会发现返回栈中已经存在一个FirstActivity的实例,并且是在SecondActivity的下面,于是SecondActivity会从返回栈中出栈,而FirstActivity重新成为了栈顶Activity,因此FirstActivity的onRestart()方法和SecondActivity的onDestroy()方法会得到执行。现在返回栈中只剩下
-一个FirstActivity的实例了,按一下Back键就可以退出程序。
+在SecondActivity中启动FirstActivity时,会发现返回栈中已经存在一个FirstActivity的实例,并且是在SecondActivity的下面,于是SecondActivity会从返回栈中出栈,而FirstActivity重新成为了栈顶Activity,因此FirstActivity的onRestart()方法和SecondActivity的onDestroy()（这里tag内容应该是SecondActivity，手误打错了，结果还是正确的）方法会得到执行。现在返回栈中只剩下一个FirstActivity的实例了,按一下Back键就可以退出程序。
 
 ![singleTask模式原理示意图](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220412150546383.png)
 

@@ -302,7 +302,7 @@ origin	git@github.com:niuyuhao/gitstudy (push)
 1. 任何新的功能（feature）或 bug 修复全都新建一个 `branch` 来写；
 2. `branch` 写完后，合并到 `master`，然后删掉这个 `branch`。
 
-<img src="git/15fde6edbfe362c4tplv-t2oaga2asx-zoom-in-crop-mark1304000.webp" style="zoom:67%;" />
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/15fde6edbfe362c4~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp" style="zoom:50%;" />
 
 创建一个分支 例如dev，在dev分支上进行开发工作。完成之后push到中央仓库，等其他人拉取review，确认可以合并到master分之后，合并完push之后删除分支。
 
