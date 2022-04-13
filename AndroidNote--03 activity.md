@@ -1096,7 +1096,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
 Intent还可以结合Bundle一起用于传递数据。首先把需要传递的数据都保存在Bundle对象中,然后再将Bundle对象存放在Intent里。到了目标Activity之后,先从Intent中取出Bundle,再从Bundle中一一取出数据。
 
-#### 问题：
+#### 问题
 
 没有做出来Activity被回收，所以也没看着上面代码的具体效果
 
