@@ -25,7 +25,7 @@ Android系统是基于Linux内核的,这一层为Android设备的各种硬件提
 1. 四大组件
    Android系统四大组件分别是Activity、Service、BroadcastReceiver和ContentProvider。
 
-   - Activity是所有Android应用程序的门面,凡是在应用中你看得到的东西,都是放在Activity中的。
+   - Activity是所有Android应用程序的门面,凡是在应用中看得到的东西,都是放在Activity中的。
    - Service在后台默默地运行,即使用户退出了应用,Service仍然是可以继续运行的。
    - BroadcastReceiver允许你的应用接收来自各处的广播消息,比如电话、短信等,你的应用也可以向外发出广播消息。
    - ContentProvider则为**应用程序之间共享数据**提供了可能,比如你想要读取系统通讯录中的联系人,就需要通过ContentProvider来实现。
@@ -76,15 +76,15 @@ http://www.android-studio.org/
 2. app
    **项目中的代码、资源等内容都是放置在这个目录下的,我们后面的开发工作也基本是在这个目录下进行的,待会儿还会对这个目录单独展开讲解。**
 3. build
-   这个目录主要包含了一些在编译时自动生成的文件,你也不需要过多关心。
+   这个目录主要包含了一些在编译时自动生成的文件,不需要过多关心。
 4. gradle
    这个目录下包含了gradle wrapper的配置文件,使用gradle wrapper的方式不需要提前将gradle下载好,而是会自动根据本地的缓存情况决定是否需要联网下载gradle。
    Android Studio默认就是启用gradle wrapper方式的,如果需要更改成离线模式,可以点击Android Studio导航栏→File→Settings→Build, Execution,Deployment→Gradle,进行配置更改。
 5. .gitignore
-   这个文件是用来将指定的目录或文件排除在版本控制之外的。关于版本控制,我们将在第6章中开始正式的学习。
+   这个文件是用来将指定的目录或文件排除在版本控制之外的。
 6. build.gradle
-   这是项目全局的gradle构建脚本,通常这个文件中的内容是不需要修改的。稍后我们将会
-   详细分析gradle构建脚本中的具体内容。
+   这是项目全局的gradle构建脚本,通常这个文件中的内容是不需要修改的。
+   后面详细分析gradle构建脚本中的具体内容。
 7. gradle.properties
    这个文件是全局的gradle配置文件,在这里配置的属性将会影响到项目中所有的gradle编译脚本。
 8. gradlew和gradlew.bat
@@ -107,9 +107,9 @@ http://www.android-studio.org/
 03. androidTest
 此处是用来编写Android Test测试用例的,可以对项目进行一些自动化测试。
 04. **java**
-毫无疑问,**java目录是放置我们所有Java代码的地方**(Kotlin代码也放在这里),展开该目录,你将看到系统帮我们自动生成了一个MainActivity文件。
+**java目录是放置我们所有Java代码的地方**,展开该目录,系统帮我们自动生成了一个MainActivity文件。
 05. res
-这个目录下的内容就有点多了。简单点说,就是你**在项目中使用到的所有图片、布局、字符串等资源都要存放在这个目录下**。当然这个目录下还有很多子目录,图片放在drawable目录下,布局放在layout目录下,字符串放在values目录下,所以你不用担心会把整个res目录弄得乱糟糟的。
+这个目录下的内容,就是**在项目中使用到的所有图片、布局、字符串等资源都要存放在这个目录下**。这个目录下还有很多子目录,图片放在drawable目录下,布局放在layout目录下,字符串放在values目录下。
 06. **AndroidManifest.xml**
 这是整个Android项目的配置文件,你在程序中定义的所有四大组件都需要在这个文件里注册,另外还可以在这个文件中给应用程序添加权限声明。
 
@@ -267,7 +267,9 @@ Logcat中的日志级别控制。Logcat中主要有5个级别,分别对应上一
 
 ## 3.1 Activity是什么
 
-Activity是一种可以包含用户界面的组件,主要用于和用户进行交互。一个应用程序中可以包含零个或多个Activity。
+Activity：在Android中，Activity代表手机或者平板电脑中的一屏，提供和用户交互的可视化界面。
+
+Activity是一种可以包含用户界面的组件（在一个Activity中可以添加很多组件，这些组件负责具体的功能）,主要用于和用户进行交互。一个应用程序中可以包含零个或多个Activity。
 
 ## 3.2 Activity的基本用法
 
@@ -278,10 +280,10 @@ Activity是一种可以包含用户界面的组件,主要用于和用户进行�
 2. 在app/src/main/java/com.example.activitytest目录下
    - New→Activity→Empty Activity
 3. 勾选Generate Layout File表示会自动为FirstActivity创建一个对应的布局文件,
-   勾选Launcher Activity表示会自动将FirstActivity设置为当前项目的Activity。
+   勾选Launcher Activity表示会自动将FirstActivity设置为当前项目的主Activity。
    - ![image-20220411094745773](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220411094745773.png)
 
-？？？项目中的任何Activity都应该重写onCreate()方法？？？
+项目中的任何Activity都应该重写onCreate()方法
 
 ### 3.2.2 创建和加载布局
 
@@ -363,12 +365,15 @@ Activity是一种可以包含用户界面的组件,主要用于和用户进行�
 </manifest>
 ```
 
-Activity的注册声明要放在<application>标签内,这里是通过<activity>标签
-来对Activity进行注册的。Android Studio在当创建Activity或其他系统组件时，会自动在AndroidManifest.xml中进行注册。
+Activity的注册声明要放在<application>标签内,这里是通过<activity>标签来对Activity进行注册的。Android Studio在当创建Activity或其他系统组件时，会自动在AndroidManifest.xml中进行注册。
 在<activity>标签中,android:name来指定具体注册哪一个Activity,这里填入的.FirstActivity是com.example.activitytest.FirstActivity的缩写。由于在最外层的<manifest>标签中已经通过package属性指定了程序的包名是com.example.activitytest,因此在注册Activity时,这一部分可以直接使用.FirstActivity。
 还需要为程序配置主Activity。也就是说,程序运行起来的时候,首先启动的Activity。配置主Activity的方法就是在<activity>标签的内部加入<intent-filter>标签,并在标签里添加
+
+```xml
 <action android:name="android.intent.action.MAIN"/>
 <category android:name="android.intent.category.LAUNCHER" />
+```
+
 这两句声明即可。
 
 使用android:label指定Activity中标题栏的内容,标题栏是显示在Activity最顶部的。需要注意的是,给主Activity指定的label不仅会成为标题栏中的内容,还会成为启动器(Launcher)中应用程序显示的名称。
@@ -848,31 +853,29 @@ Android中的Activity是可以层叠的。每启动一个新的Activity,就会�
 
 每个Activity在其生命周期中最多可能会有4种状态。
 
-01. 运行状态
-当一个Activity位于返回栈的栈顶时,Activity就处于运行状态。系统最不愿意回收的就是处于运行状态的Activity,因为这会带来非常差的用户体验。
-01. 暂停状态
-当一个Activity不再处于栈顶位置,但仍然可见时,Activity就进入了暂停状态。``Activity已经不在栈顶了,怎么会可见呢``因为并不是每一个Activity都会占满整个屏幕,比如对话框形式的Activity只会占用屏幕中间的部分区域。处于暂停状态的Activity仍然是完全存活着的,系统也不愿意回收这种Activity(因为它还是可见的,回收可见的东西都会在用户体验方面有不好的影响),只有在内存极低的情况下,系统才会去考虑回收这种Activity。
-03. 停止状态
-**当一个Activity不在处于栈顶位置,并且完全不可见的时候,就进入了停止状态。**系统仍然会为这种Activity保存相应的状态和成员变量,但是这并不是完全可靠的,当其他地方需要内存时,处于停止状态的Activity有可能会被系统回收。
-04. 销毁状态
-一个Activity从返回栈中移除后就变成了销毁状态。系统最倾向于回收处于这种状态的
-Activity,以保证手机的内存充足。
+
+|   状态   | 描述                                                         |
+| :------: | :----------------------------------------------------------- |
+| 运行状态 | 当一个Activity位于返回栈的栈顶时,Activity就处于运行状态。系统最不愿意回收的就是处于运行状态的Activity,因为这会带来非常差的用户体验。 |
+| 暂停状态 | **一个Activity不再处于栈顶位置,但仍然可见时**,Activity就进入了暂停状态。比如启动对话框形式的Activity只会占用屏幕中间的部分区域。处于暂停状态的Activity仍然是完全存活着的,系统也不愿意回收这种Activity(因为它还是可见的),只有在内存极低的情况下,系统才会去考虑回收这种Activity。 |
+| 停止状态 | 当**当一个Activity不在处于栈顶位置,并且被其他Activity所覆盖处于完全不可见的时候,就进入了停止状态。**但是系统仍然会为这种Activity保存相应的状态和信息,但是这并不是完全可靠的,当其他地方需要内存时,处于停止状态的Activity有可能会被系统回收。 |
+| 销毁状态 | 一个Activity从返回栈中移除后就变成了销毁状态。系统最倾向于回收处于这种状态的Activity,以保证手机的内存充足。 |
+
+
 
 ### 3.4.3 Activity的生存期
 
 Activity类中定义了7个回调方法,覆盖了Activity生命周期的每一个环节,下面是对这7个方法的介绍。
 
-- onCreate()。在每个Activity中都重写了这个方法,它会在Activity第一次被创建的时候调用。应该在这个方法中完成**Activity的初始化操作,比如加载布局、绑定事件等。**
-- onStart()。这个方法在Activity由**不可见变为可见**的时候调用。
-- onResume()。这个方法在Activity**准备好和用户进行交互的时候调用**。此时的Activity一定位于返回栈的栈顶,并且处于运行状态。
-- onPause()。**这个方法在系统准备去启动或者恢复另一个Activity的时候调用**。通常会在这个方法中将一些消耗CPU的资源释放掉,以及保存一些关键数据,但这个方法的执行速度一定要快,不然会影响到新的栈顶Activity的使用。
-- onStop()。这个方法在Activity**完全不可见的时候调用**。它和onPause()方法的主要区
-  别在于,如果启动的新Activity是一个对话框式的Activity,那么onPause()方法会得到执
-  行,而onStop()方法并不会执行。
-- onDestroy()。这个方法在Activity被销毁之前调用,之后Activity的状态将变为销毁状
-  态。
-- onRestart()。这个方法在Activity由停止状态变为运行状态之前调用,也就是Activity
-  被重新启动了。
+|   方法名    |                             描述                             |
+| :---------: | :----------------------------------------------------------: |
+| onCreate()  | 在每个Activity中都重写了这个方法,它会在Activity第一次被创建的时候调用。应该在这个方法中完成**Activity的初始化操作,比如加载布局、绑定事件等。** |
+|  onStart()  | 启动Activity时被回调，也就是Activity由**不可见变为可见**的时候调用。 |
+| onResume()  | 这个方法在Activity**准备好和用户进行交互的时候调用**。此时的Activity一定位于返回栈的栈顶,并且处于运行状态。该方法总是在onPause()方法以后执行。 |
+| onPause()。 | **这个方法在系统准备去启动或者恢复另一个Activity的时候调用（暂停Activity时被调用）**。通常会在这个方法中将一些消耗CPU的资源释放掉（？）,以及保存一些关键数据（？）,但这个方法的执行速度一定要快,不然会影响到新的栈顶Activity的使用。 |
+|  onStop()   | 这个方法在Activity**完全不可见的时候调用（停止Activity时被调用）**。它和onPause()方法的主要区别在于,如果启动的新Activity是一个对话框式的Activity,那么onPause()方法会得到执行,而onStop()方法并不会执行。 |
+| onDestroy() | 这个方法在Activity被销毁之前调用,之后Activity的状态将变为销毁状态。 |
+| onRestart() | 这个方法在Activity由停止状态变为运行状态之前调用（重新启动Activity时被回调）。 |
 
 以上7个方法中除了onRestart()方法,其他都是两两相对的,从而又可以将Activity分为以下3种生存期。
 
@@ -1056,12 +1059,11 @@ onDestroy()方法中完成释放内存的操作。
 当一个Activity进入了停止状态,是有可能被系统回收的。
 
 场景:
-``应用中有一个Activity A,用户在Activity A的基础上启动了Activity B,Activity A就进入了停止状态,这个时候由于系统内存不足,将Activity A回收掉了,然后用户按下Back键返回
-Activity A,会出现什么情况?
+``应用中有一个Activity A,用户在Activity A的基础上启动了Activity B,Activity A就进入了停止状态,这个时候由于系统内存不足,将Activity A回收掉了,然后用户按下Back键返回Activity A,会出现什么情况?
 其实还是会正常显示Activity A的,只不过这时并不会执行onRestart()方法,而是会执行Activity A的onCreate()方法,因为Activity A在这种情况下会被重新创建一次。``
 这样看上去好像一切正常,可是有一个重要问题:Activity A中是可能存在临时数据和状态的。比如,MainActivity中如果有一个文本输入框,现在输入了一段文字,然后启动NormalActivity,这时MainActivity由于系统内存不足被回收掉,过了一会又点击了Back键回到MainActivity,刚刚输入的文字都没了,因为MainActivity被重新创建了。
 
-Activity中提供了一个onSaveInstanceState()回调方法,这个方法可以保证在Activity被回收之前一定会被调用,可以通过这个方法来解决问题。
+Activity中提供了一个onSaveInstanceState()回调方法,这个方法可以保证在**Activity被回收之前**一定会被调用,可以通过这个方法来解决问题。
 onSaveInstanceState()方法会携带一个Bundle类型的参数,Bundle提供了一系列的方法
 用于保存数据,比如可以使用putString()方法保存字符串,使用putInt()方法保存整型数据,以此类推。每个保存方法需要传入两个参数,第一个参数是键,用于后面从Bundle中取值,第二个参数是真正要保存的内容。
 
@@ -1093,6 +1095,10 @@ protected void onCreate(Bundle savedInstanceState) {
 ```
 
 Intent还可以结合Bundle一起用于传递数据。首先把需要传递的数据都保存在Bundle对象中,然后再将Bundle对象存放在Intent里。到了目标Activity之后,先从Intent中取出Bundle,再从Bundle中一一取出数据。
+
+#### 问题：
+
+没有做出来Activity被回收，所以也没看着上面代码的具体效果
 
 ## 3.5 Activity的启动模式
 
