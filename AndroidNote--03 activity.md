@@ -108,7 +108,7 @@ http://www.android-studio.org/
 此处是用来编写Android Test测试用例的,可以对项目进行一些自动化测试。
 04. **java**
 **java目录是放置我们所有Java代码的地方**,展开该目录,系统帮我们自动生成了一个MainActivity文件。
-05. res
+05. **res**
 这个目录下的内容,就是**在项目中使用到的所有图片、布局、字符串等资源都要存放在这个目录下**。这个目录下还有很多子目录,图片放在drawable目录下,布局放在layout目录下,字符串放在values目录下。
 06. **AndroidManifest.xml**
 这是整个Android项目的配置文件,你在程序中定义的所有四大组件都需要在这个文件里注册,另外还可以在这个文件中给应用程序添加权限声明。
@@ -132,7 +132,7 @@ IntelliJ IDEA项目自动生成的文件,我们不需要关心或修改这个文
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <!--表示MainActivity是这个项目的主Activity,在手机上点击应用图标,首先启动的就是这个Activity-->
+    <!--表示MainActivity是这个项目的主Activity,在手机上点击应用图标,首先启动的就是这个Activity-->
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

@@ -301,6 +301,240 @@ progressDialog.dismiss();关闭对话框
 
 ### 4.3.1 线性布局
 
+这个布局会将它所包含的控件在线性方向上依次排列。
+
+通过``android:orientation``属性指定了排列方向是vertical  ----->  垂直排列；horizontal  -----> 水平排列
+
+在activity_main.xml中 添加三个按钮，将长和宽都设置成wrap_content，指定vertical为排列方向。
+
+改为horizontal 则为水平排列
+
+注意,如果LinearLayout的排列方向是horizontal,内部的控件就绝对不能将宽度指定为match_parent,否则,单独一个控件就会将整个水平方向占满,其他的控件就没有可放置的位置。同样的道理,如果LinearLayout的排列方向是vertical,内部的控件就不能将高度指定为match_parent。
+``android:layout_gravity``属性：用于指定控件在布局中的对齐方式。android:layout_gravity的可选值和android:gravity差不多,但是需要注意
+
+当LinearLayout的排列方向是horizontal时,只有垂直方向上的对齐方式才会生效。因为此时水平方向上的长度是不固定的,每添加一个控件,水平方向上的长度都会改变,因而无法指定该方向上的对齐方式。
+
+同样的道理,当LinearLayout的排列方向是vertical时,只有水平方向上的对齐方式才会生效。
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="horizontal"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+    <Button
+    android:id="@+id/button1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top"
+    android:text="Button 1" />
+    <Button
+    android:id="@+id/button2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:text="Button 2" />
+    <Button
+    android:id="@+id/button3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:text="Button 3" />
+</LinearLayout>
+```
+
+指定垂直方向上的排列方向,将第一个Button的对齐方式指定为top,第二个Button的对齐方式指定为
+center_vertical,第三个Button的对齐方式指定为bottom。
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414092813234.png" alt="指定layout_gravity的效果" style="zoom:50%;" />
+
+``android:layout_weight``属性：允许我们使用比例的方式来指定控件的大小。作用在手机屏幕的适配性方面。
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <EditText
+        android:id="@+id/input_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="写点什么吧" />
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="send" />
+</LinearLayout>
+```
+
+由于使用了``android:layout_weight``属性,此时控件的宽度就不应该再由android:layout_width来决定了,这里指定成0dp是一种比较规范的写法。1代表这两个评分屏幕的宽度。
+让EditText占据屏幕宽度的3/5,Button占据屏幕宽度的2/5,将EditText的layout_ weight改成3,Button的layout_weight改成2就可以了。
+
+通过指定**部分控件的layout_weight值**来实现更好的效果。修改activity_main.xml中的代码
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <!--EditText则会占满屏幕所有的剩余空间-->
+    <EditText
+        android:id="@+id/input_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="写点什么吧" />
+    <!--Button的宽度仍然按照wrap_content来计算-->
+    <Button
+        android:id="@+id/send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="send" />
+</LinearLayout>
+```
+
+### 4.3.2 相对布局
+
+RelativeLayout通过相对定位的方式让控件出现在布局的任何位置。
+
+1. 相对于父布局进行定位
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="button 1" />
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="button 2" />
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="button 3" />
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="button 4" />
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="button 5" />
+</RelativeLayout>
+```
+
+2. 相对于控件进行定位
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         xmlns:tools="http://schemas.android.com/tools"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         tools:context=".MainActivity">
+         <Button
+             android:id="@+id/button3"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_centerInParent="true"
+             android:text="button 3" />
+         <Button
+             android:id="@+id/button1"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_above="@+id/button3"
+             android:layout_toLeftOf="@id/button3"
+             android:text="button 1" />
+         <Button
+             android:id="@+id/button2"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_above="@id/button3"
+             android:layout_toRightOf="@id/button3"
+             android:text="button 2" />
+     
+         <Button
+             android:id="@+id/button4"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_below="@id/button3"
+             android:layout_toLeftOf="@id/button3"
+             android:text="button 4" />
+         <Button
+             android:id="@+id/button5"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_below="@id/button3"
+             android:layout_toRightOf="@id/button3"
+             android:text="button 5" />
+     </RelativeLayout>
+     ```
+
+   - <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414102940889.png" alt="image-20220414102940889" style="zoom:50%;" />
+
+   - 注意：当一个控件去引用另一个控件的id时,该控件一定要定义在引用控件的后面,不然会出现找不到id的情况。
+
+3. RelativeLayout中还有另外一组相对于控件进行定位的属性,android:layout_alignLeft表示让一个控件的左边缘和另一个控件的左边缘对齐,android:layout_alignRight表示让一个控件的右边缘和另一个控件的右边缘对齐。android:layout_alignTop和android:layout_alignBottom同理
+
+### 4.3.3 帧布局
+
+这种布局所有的控件都会默认摆放在布局的左上角。
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <TextView
+        android:id="@+id/text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This is TextView"/>
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher"/>
+</FrameLayout>
+```
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414104736476.png" alt="FrameLayout运行效果" style="zoom: 50%;" />
+
+使用``layout_gravity``指定对齐方式
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414104958321.png" alt="image-20220414104958321" style="zoom:50%;" />
+
+### 4.3.4 百分比布局
+
 
 
 ## 4.4 自定义控件
