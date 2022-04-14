@@ -329,6 +329,10 @@ add 添加的是文件的改动，而不是文件名
 
 `rebase` 的意思是，给你的 `commit` 序列重新设置基础点（也就是父 `commit`）。展开来说就是，把你指定的 `commit` 以及它所在的 `commit` 串，以指定的目标 `commit` 为基础，依次重新提交一次。
 
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/1600abd620a8e28c~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp" style="zoom:50%;" />
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/160149e054fe485c~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp" style="zoom:50%;" />
+
 - 在master分支  
   - `git checkout branch1` 
   - `git rebase master`
@@ -345,7 +349,7 @@ add 添加的是文件的改动，而不是文件名
 
 ## 02 commit之后发现错误的修复
 
-1. git reset --hard HEAD^` 回退到上一个commit
+1. `git reset --hard HEAD^` 回退到上一个commit
 2. `git commit --amend`可以修复当前提交的错误
    - 直接进行修改之后`git add`   然后使用`git commit --amend`
    - 需要注意的有一点：`commit --amend` 并不是直接修改原 `commit` 的内容，而是会把当前一次 `commit` 里的内容和暂存区里的内容合并起来后创建一个新的 `commit`，**用这个新的 `commit` 把当前 `commit` 替换掉**。

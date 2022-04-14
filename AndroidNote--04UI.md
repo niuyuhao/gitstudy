@@ -533,13 +533,148 @@ RelativeLayout通过相对定位的方式让控件出现在布局的任何位置
 
 <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414104958321.png" alt="image-20220414104958321" style="zoom:50%;" />
 
-### 4.3.4 百分比布局
+### 4.3.4 百分比布局（build.gradle这个文件内容待学习）
 
 
 
 ## 4.4 自定义控件
 
+所有控件都是直接或间接继承自View,所用的所有布局都是直接或间接继承自ViewGroup的。
 
+View是Android中最基本的一种UI组件,它可以在屏幕上绘制一块矩形区域,并能响应这块区域的各种事件,我们使用的各种控件其实就是在View的基础上又添加了各自特有的功能。而ViewGroup则是一种特殊的View,它可以包含很多子View和子ViewGroup,是一个用于放置控件和布局的容器。
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414163546727.png" alt="常用控件的布局的继承结构" style="zoom: 67%;" />
+
+可以利用上面的继承机构创建自定义控件。新建UICustomViews  project
+
+### 4.4.1 引入布局
+
+新建一个布局title.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/black">
+    <!--android:background用于为布局或控件指定一个背景,可以使用颜色或图片来进行填充-->
+    <!--android:layout_margin属性可以指定控件在上下左右方向上的间距-->
+    <!--android:layout_marginLeft或android:layout_marginTop单独指定控件在某个方向上的间距-->
+    <Button
+        android:id="@+id/titleBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:text="Back"
+        android:textColor="#fff" />
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Title Text"
+        android:textColor="#fff"
+        android:textSize="24sp" />
+    <Button
+        android:id="@+id/titleEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:text="Edit"
+        android:textColor="#fff" />
+</LinearLayout>
+```
+
+在activity_main.xml中的代码
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+	<!--引入标题栏布局-->
+    <include layout="@layout/title" />
+</LinearLayout>
+```
+
+在MainActivity中将系统自带的标题栏隐藏掉
+
+```java
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        //获得ActionBar的实例
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            //隐藏标题栏
+            actionBar.hide();
+        }
+    }
+}
+```
+
+### 4.4.2 创建自定义控件
+
+通过自定义控件，解决每一个活动中都需要重新注册一遍按钮的点击事件。
+
+新建TitleLayout
+
+```Java
+//继承LinearLayout，成为自定义的标题栏控件
+public class TitleLayout extends LinearLayout {
+    public TitleLayout(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        //通过LayoutInflater.from()方法可以构建出一个LayoutInflater对象
+        //调用inflate()方法动态加载一个布局文件
+        //参数1  要加载的布局文件的id  参数2 给加载好的布局再添加一个父布局
+        LayoutInflater.from(context).inflate(R.layout.title,this);
+        Button titleBack = findViewById(R.id.titleBack);
+        Button titleEdit = findViewById(R.id.titleEdit);
+        titleBack.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((Activity)getContext()).finish();
+            }
+        });
+        titleEdit.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(),"click edit btn",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+```
+
+创建好之后，在布局文件中添加这个自定义控件
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+	<!--指明控件的完整类名，包名不可以省略-->
+    <com.nyh.uicustomviews.TitleLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+```
+
+注册点击事件
+
+这样在一个布局中引入TitleLayout时，按钮的点击事件就已经实现好了。
 
 ## 4.5 ListView
 

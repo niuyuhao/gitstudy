@@ -499,9 +499,7 @@ button1.setOnClickListener(new View.OnClickListener() {
 不管创建多少个Activity,方法都和上一节中介绍的是一样的。唯一的问题在于,在启动器中点击应用的图标只会进入该应用的主Activity。**由主Activity跳转到别的Activity**
 
 ### 3.3.1 使用显式 Intent
-再快速地创建一个Activity。右击com.example.activitytest→New→Activity→Empty Activity,命名为SecondActivity,并勾选Generate Layout File,给布局文件起名为second_layout,但不要勾选Launcher Activity选项
-
-点击“Finish”完成创建,Android Studio会自动生成SecondActivity.java和second_layout.xml这两个文件。
+再快速地创建一个Activity。右击com.example.activitytest→New→Activity→Empty Activity,命名为SecondActivity,并勾选Generate Layout File,给布局文件起名为second_layout,但不要勾选Launcher Activity选项,点击“Finish”完成创建,Android Studio会自动生成SecondActivity.java和second_layout.xml这两个文件。
 这里还是使用的LinearLayout,编辑second_layout.xml,将里面的代码替换成如下内容:
 
 ```xml
@@ -761,8 +759,7 @@ protected void onCreate(Bundle savedInstanceState) {
 返回上一个活动只需要按一下Back键并没有一个用于启动活动Intent来传递数据。
 
 Activity中还有一个startActivityForResult()方法也是用于启动活动的，但这个方法期望在活动销毁的时候能够返回一个结果给上一个活动。
-startActivityForResult()方法接收两个参数，第一个参数还是Intent,第二个参数是请
-求码，用于在之后的回调中判断数据的来源。
+startActivityForResult()方法接收两个参数，第一个参数还是Intent,第二个参数是请求码，用于在之后的回调中判断数据的来源。
 
 修改FirstActivity中按钮的点击事件，代码如下所示：
 
@@ -845,11 +842,7 @@ public void onBackPressed() {
 ### 3.4.1 返回栈
 
 Android中的Activity是可以层叠的。每启动一个新的Activity,就会覆盖在原Activity之上,然后点击Back键会销毁最上面的Activity,下面的一个Activity就会重新显示出来。
-其实Android是使用任务(task)来管理Activity的,一个任务就是一组存放在栈里的Activity
-的集合,这个栈也被称作返回栈(back stack)。栈是一种后进先出的数据结构,在默认情况
-下,每当启动了一个新的Activity,它就会在返回栈中入栈,并处于栈顶的位置。而每当我
-们按下Back键或调用finish()方法去销毁一个Activity时,处于栈顶的Activity就会出栈,前
-一个入栈的Activity就会重新处于栈顶的位置。系统总是会显示处于栈顶的Activity给用户
+其实Android是使用任务(task)来管理Activity的,一个任务就是一组存放在栈里的Activity的集合,这个栈也被称作返回栈(back stack)。栈是一种后进先出的数据结构,在默认情况下,每当启动了一个新的Activity,它就会在返回栈中入栈,并处于栈顶的位置。而每当我们按下Back键或调用finish()方法去销毁一个Activity时,处于栈顶的Activity就会出栈,前一个入栈的Activity就会重新处于栈顶的位置。系统总是会显示处于栈顶的Activity给用户
 
 <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220412093439527.png" alt="image-20220412093439527" style="zoom: 50%;" />
 
@@ -1071,7 +1064,7 @@ Activity中提供了一个onSaveInstanceState()回调方法,这个方法可以�
 onSaveInstanceState()方法会携带一个Bundle类型的参数,Bundle提供了一系列的方法
 用于保存数据,比如可以使用putString()方法保存字符串,使用putInt()方法保存整型数据,以此类推。每个保存方法需要传入两个参数,第一个参数是键,用于后面从Bundle中取值,第二个参数是真正要保存的内容。
 
-在MainActivity中添加如下代码讲临时数据进行保存
+在MainActivity中添加如下代码将临时数据进行保存
 
 ```java
 @Override
@@ -1446,7 +1439,7 @@ intent.putExtra("param2", "data2");
 startActivity(intent);
 ```
 
-虽然这样写是完全正确的,但是在真正的项目开发中经常会出现对接的问题。比如SecondActivity不是由你开发的,但现在你负责开发的部分需要启动SecondActivity,而你却不清楚启动SecondActivity需要传递哪些数据。这时无非就有两个办法:一个是你自己去阅读SecondActivity中的代码,另一个是询问负责编写SecondActivity的同事。你会不会觉得很麻烦呢?其实只需要换一种写法,就可以轻松解决上面的窘境。
+虽然这样写是完全正确的,但是在真正的项目开发中经常会出现对接的问题。比如SecondActivity不是由你开发的,但现在你负责开发的部分需要启动SecondActivity,却**不清楚启动SecondActivity需要传递哪些数据**。这时无非就有两个办法:一个是你自己去阅读SecondActivity中的代码,另一个是询问负责编写SecondActivity的同事。换一种写法,就可以轻松解决上面的问题。
 修改SecondActivity中的代码,如下所示:
 
 ```java
