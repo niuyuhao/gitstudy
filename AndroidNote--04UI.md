@@ -245,9 +245,9 @@ btn4.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-        dialog.setTitle("this is dialog");
+        dialog.setTitle("this is dialog"); 
         dialog.setMessage("something important");
-        dialog.setCancelable(false);
+        dialog.setCancelable(false); //可否取消
         dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -539,7 +539,7 @@ RelativeLayout通过相对定位的方式让控件出现在布局的任何位置
 
 ## 4.4 自定义控件
 
-所有控件都是直接或间接继承自View,所用的所有布局都是直接或间接继承自ViewGroup的。
+**所有控件都是直接或间接继承自View,所用的所有布局都是直接或间接继承自ViewGroup的**。
 
 View是Android中最基本的一种UI组件,它可以在屏幕上绘制一块矩形区域,并能响应这块区域的各种事件,我们使用的各种控件其实就是在View的基础上又添加了各自特有的功能。而ViewGroup则是一种特殊的View,它可以包含很多子View和子ViewGroup,是一个用于放置控件和布局的容器。
 
@@ -624,7 +624,7 @@ public class MainActivity extends AppCompatActivity {
 
 ### 4.4.2 创建自定义控件
 
-通过自定义控件，解决每一个活动中都需要重新注册一遍按钮的点击事件。
+通过自定义控件，解决：每一个活动中都需要重新注册一遍按钮的点击事件。
 
 新建TitleLayout
 
@@ -677,6 +677,284 @@ public class TitleLayout extends LinearLayout {
 这样在一个布局中引入TitleLayout时，按钮的点击事件就已经实现好了。
 
 ## 4.5 ListView
+
+ListView：在屏幕上显示大量数据。
+
+### 4.5.1 ListView的简单用法
+
+新建ListViewTest，创建好Activity，在activity_main.xml中加入ListView
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
+```
+
+MainActivity
+
+```Java
+public class MainActivity extends AppCompatActivity {
+    //使用一个string数组，模拟一些数据
+    private String[] data = {"宋家庄","石榴庄","大红门","角门东","角门西","草桥","牛街","积水潭","牡丹园", "美团单车","志新桥","志新西路","打卡"};
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1,data);
+        ListView listView = findViewById(R.id.listView);
+        listView.setAdapter(adapter);
+    }
+}
+```
+
+集合中的数据是无法直接传递给ListView的,需要借助适配器来完成。Android中提供了很多适配器的实现类,本次使用ArrayAdapter。它可以通过泛型来指定要适配的数据类型,然后在构造函数中把要适配的数据传入。ArrayAdapter有多个构造函数的重载,根据实际情况选择最合适的一种。由于这里提供的数据都是字符串,因此将ArrayAdapter的泛型指定为String,然后在ArrayAdapter的构造函数中依次传入Activity的实例、ListView子项布局的id,以及数据源。
+此处``android.R.layout.simple_list_item_1``作为ListView子项布局的id,这是一个Android内置的布局文件,里面只有一个TextView,可用于简单地显示一段文本。这样适配器对象就构建好了。
+最后,调用ListView的setAdapter()方法,将构建好的适配器对象传递进去,ListView和数据之间的关联就建立完成了。
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220415102837066.png" alt="image-20220415102837066" style="zoom:50%;" />
+
+### 4.5.2 定制ListView的界面
+
+让名称旁边显示一个图片。
+
+1. 定义一个地铁类，作为ListView适配器的适配类型。
+
+   - ```java
+     public class Subwaystation {
+         private String name;
+         private int imageId;  //对应图片id
+         public Subwaystation(String name,int imageId){
+             this.name = name;
+             this.imageId = imageId;
+         }
+     
+         public String getName() {
+             return name;
+         }
+     
+         public int getImageId() {
+             return imageId;
+         }
+     }
+     ```
+
+   - 
+
+2. 给ListView的子项指定一个自定义的布局，在layout下新建station_item.xml
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content">
+         <!--显示图-->
+         <ImageView
+             android:id="@+id/stationImage"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content" />
+         <!--显示名称-->
+         <TextView
+             android:id="@+id/stationName"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_vertical"
+             android:layout_marginLeft="10dp"/>
+     </LinearLayout>
+     ```
+
+3. 新建类StationAdapter，这个适配器继承自ArrayAdapter，将泛型指定为SubwayStation，创建一个自定义的适配器。
+
+   - ```java
+     public class StationAdapter extends ArrayAdapter<Subwaystation> {
+         private int resourceId;
+         //将context，ListView子项布局的id和数据传递进来
+         public StationAdapter(@NonNull Context context, int textViewResourceId, @NonNull List<Subwaystation> objects) {
+             super(context, textViewResourceId, objects);
+             resourceId = textViewResourceId;
+         }
+     
+         //该方法在每个子项被滚动到屏幕内的时候会被调用。
+         @NonNull
+         @Override
+         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+             Subwaystation station = getItem(position); //得到SubwayStation的实例
+             //inflate()方法动态加载一个布局文件
+             //参数1  要加载的布局文件的id  参数2 给加载好的布局再添加一个父布局
+             //参数3  false 表示只让父布局中声明的layout属性生效，但不为这个view添加父布局
+             View view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false); 
+             //获取到 ImageView TextView的实例  将station的属性设置给布局文件
+             ImageView stationImage = view.findViewById(R.id.stationImage);
+             TextView stationName = view.findViewById(R.id.stationName);
+             //设置图片和文字
+             stationImage.setImageResource(station.getImageId());
+             stationName.setText(station.getName());
+             return view;
+         }
+     }
+     ```
+
+   - 完成自定义适配器
+
+4. 修改MainActivity中的代码
+
+   - ```Java
+     public class MainActivity extends AppCompatActivity {
+         private List<Subwaystation> subwaystationList = new ArrayList<>();
+         @Override
+         protected void onCreate(Bundle savedInstanceState) {
+             super.onCreate(savedInstanceState);
+             setContentView(R.layout.activity_main);
+             initStation(); //初始化
+             //创建StationAdapter对象
+             StationAdapter adapter = new StationAdapter(MainActivity.this, R.layout.station_item,subwaystationList);
+             ListView listView = findViewById(R.id.listView);
+             //将StationAdapter传递给ListView
+             listView.setAdapter(adapter);
+         }
+         
+         private void initStation() {
+             //添加两遍，为了数据多一点
+             for (int i = 0; i < 2; i++) {
+                 Subwaystation songJiaZhuang  = new Subwaystation("宋家庄",R.drawable.ic_launcher_background); //图片用的自带的
+                 subwaystationList.add(songJiaZhuang);
+                 Subwaystation shiLiuZhuang  = new Subwaystation("石榴庄",R.drawable.ic_launcher_background);
+                 subwaystationList.add(shiLiuZhuang);
+                 Subwaystation daHongMen  = new Subwaystation("大红门",R.drawable.ic_launcher_background);
+                 subwaystationList.add(daHongMen);
+                 Subwaystation jiaoMenDong  = new Subwaystation("角门东",R.drawable.ic_launcher_background);
+                 subwaystationList.add(jiaoMenDong);
+                 Subwaystation jiaoMenXi  = new Subwaystation("角门西",R.drawable.ic_launcher_background);
+                 subwaystationList.add(jiaoMenXi);
+                 Subwaystation caoQiao  = new Subwaystation("草桥",R.drawable.ic_launcher_background);
+                 subwaystationList.add(caoQiao);
+                 Subwaystation niuJie  = new Subwaystation("牛街",R.drawable.ic_launcher_background);
+                 subwaystationList.add(niuJie);
+                 Subwaystation jiShuiTan  = new Subwaystation("积水潭",R.drawable.ic_launcher_background);
+                 subwaystationList.add(jiShuiTan);
+                 Subwaystation muDanYuan  = new Subwaystation("牡丹园",R.drawable.ic_launcher_background);
+                 subwaystationList.add(muDanYuan);
+             }
+         }
+     }
+     ```
+
+5. 效果
+
+   - <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220415114833161.png" alt="image-20220415114833161" style="zoom:50%;" />
+
+### 问题：适配器？
+
+### 4.5.3 提升ListView的运行效率
+
+在StationAdapter的getView()方法中，每次都将布局重新加载了一遍，当ListView快速滚动的时候，可能会成为性能的瓶颈。
+
+使用convertView参数，将之前加载好的布局进行缓存，以便之后进行重用。
+
+```java
+public class StationAdapter extends ArrayAdapter<Subwaystation> {
+	...
+    @NonNull
+    @Override
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        Subwaystation station = getItem(position);
+        View view;
+ 		//进行了一个判断，为空则加载布局；不为空则对convertView进行重用
+        if (convertView == null){
+            view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+        } else {
+            view = convertView;
+        }
+        ImageView stationImage = view.findViewById(R.id.stationImage);
+        TextView stationName = view.findViewById(R.id.stationName);
+        stationImage.setImageResource(station.getImageId());
+        stationName.setText(station.getName());
+        return view;
+    }
+}
+```
+
+每次getView时还是会调用View的findViewById()方法来获取一次控件的实例。
+
+```java
+public class StationAdapter extends ArrayAdapter<Subwaystation> {
+	...
+    @NonNull
+    @Override
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        Subwaystation station = getItem(position);
+        View view;
+        ViewHolder viewHolder;
+        if (convertView == null){
+            view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.stationImage = view.findViewById(R.id.stationImage);
+            viewHolder.stationName = view.findViewById(R.id.stationName);
+            view.setTag(viewHolder);
+        } else {
+            view = convertView;
+            viewHolder = (ViewHolder) view.getTag();
+        }
+        viewHolder.stationImage.setImageResource(station.getImageId());
+        viewHolder.stationName.setText(station.getName());
+        return view;
+    }
+    //新增一个内部类ViewHolder  作用是对控件的实例进行缓存
+    class ViewHolder {
+        ImageView stationImage;
+        TextView stationName;
+    }
+}
+```
+
+当convertView为null的时候，创建一个ViewHolder对象，并将控件的实例都存放在ViewHolder里，然后调用View的setTag()方法，将ViewHolder对象存储在View中。
+
+当convertView不为null的时候，调用View的getTag()方法，把ViewHolder重新取出。这样所有控件的实例都缓存在了ViewHolder里，就没有必要每次都通过findViewById()方法来获取控件实例了。
+
+### 4.5.4 ListView的点击事件
+
+```java
+public class MainActivity extends AppCompatActivity {
+
+    private List<Subwaystation> subwaystationList = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        initStation(); //初始化
+        StationAdapter adapter = new StationAdapter(MainActivity.this, R.layout.station_item,subwaystationList);
+        ListView listView = findViewById(R.id.listView);
+        listView.setAdapter(adapter);
+        //给ListView注册一个监听器
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            //点击ListView中任何一个子项时，回调的方法
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //通过position判断点击的是哪一个子项，获取到相应的Subwaystation
+                Subwaystation subwaystation = subwaystationList.get(position);
+               //输出name
+                Toast.makeText(MainActivity.this,subwaystation.getName(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void initStation() {
+        for (int i = 0; i < 2; i++) {
+            ...
+        }
+    }
+}
+```
+
+
 
 ## 4.6 RecycleView
 
