@@ -543,7 +543,7 @@ RelativeLayout通过相对定位的方式让控件出现在布局的任何位置
 
 View是Android中最基本的一种UI组件,它可以在屏幕上绘制一块矩形区域,并能响应这块区域的各种事件,我们使用的各种控件其实就是在View的基础上又添加了各自特有的功能。而ViewGroup则是一种特殊的View,它可以包含很多子View和子ViewGroup,是一个用于放置控件和布局的容器。
 
-<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414163546727.png" alt="常用控件的布局的继承结构" style="zoom: 67%;" />
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414163546727.png" alt="常用控件的布局的继承结构"  />
 
 可以利用上面的继承机构创建自定义控件。新建UICustomViews  project
 
@@ -956,6 +956,531 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-## 4.6 RecycleView
+## 4.6 RecyclerView
+
+增强版的ListView。
+
+### 4.6.1 RecyclerView的基本用法
+
+创建RecyclerViewTest
+
+修改activity_main.xml中的代码
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
+```
+
+创建一个Subwaystation类 和 station_item.xml
+
+1. 为RecyclerView准备一个适配器  StationAdapter继承RecyclerView.Adapter将泛型制定为<StationAdapter.ViewHolder>。ViewHolder是在StationAdapter中自定义的一个内部类
+
+   - ```java
+     public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHolder> {
+         private List<Subwaystation> mSubwaystations;
+     
+         //首先定义一个内部类，继承自RecyclerView.ViewHolder
+         static class ViewHolder extends RecyclerView.ViewHolder{
+             ImageView stationImage;
+             TextView stationName;
+             //构造方法传入的view参数  ----> 通常是RecyclerView子项的最外层布局
+             public ViewHolder(@NonNull View itemView) {
+                 super(itemView);
+                 //可以通过 findViewById 来获取到布局中的 ImageView 和 TextView
+                 stationImage = itemView.findViewById(R.id.stationImage);
+                 stationName = itemView.findViewById(R.id.stationName);
+             }
+         }
+         // StationAdapter这个构造方法  用于把要展示的数据源传进来，并赋值给一个全局变量mSubwaystations
+         // 后续操作在这个数据源上进行
+         public StationAdapter(List<Subwaystation> subwaystations) {
+             mSubwaystations = subwaystations;
+         }
+     
+         /**
+          * 重写onCreateViewHolder()  用于创建ViewHolder实例
+          *   parent – 新视图绑定到适配器位置后将添加到的视图组。 
+          *   viewType – 新视图的视图类型。
+          *   返回：一个新的 ViewHolder，它持有给定视图类型的视图。
+          * onBindViewHolder()       用于对RecyclerView子项的数据进行赋值，会在每个子项被滚动到屏幕内的时候执行
+          * holder - 应更新以表示数据集中给定位置的项目内容的 ViewHolder。 
+          * position – 项目在适配器数据集中的位置。
+          * getItemCount()           用于告诉RecyclerView一共有多少子项，直接返回数据源长度即可
+          * */
+         @NonNull
+         @Override
+         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+             //将station_item布局加载进来，然后创建一个ViewHolder实例，将加载出来的布局传入到构造方法中
+             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.station_item,parent,false);
+             ViewHolder holder = new ViewHolder(view);
+             return holder;
+         }
+     
+         @Override
+         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+             //通过position参数得到当前项的 Subwaystation，再将数据设置到ViewHolder的ImageView和TextView
+             Subwaystation subwaystation = mSubwaystations.get(position);
+             holder.stationImage.setImageResource(subwaystation.getImageId());
+             holder.stationName.setText(subwaystation.getName());
+         }
+     
+         @Override
+         public int getItemCount() {
+             return mSubwaystations.size();
+         }
+     }
+     ```
+
+   - 首先定义了一个内部类ViewHolder,它要继承自RecyclerView.ViewHolder。然后ViewHolder的主构造函数中要传入一个View参数,这个参数通常就是RecyclerView子项的最外层布局,可以通过findViewById()方法来获取布局中ImageView和TextView的实例。
+
+   - FruitAdapter中也有一个主构造函数,它用于把要展示的数据源传进来,后续的操作都
+     将在这个数据源的基础上进行。
+     FruitAdapter是继承自RecyclerView.Adapter的,必须重写onCreateViewHolder()、onBindViewHolder()和getItemCount()这3个方法。
+
+     - onCreateViewHolder()方法是用于创建ViewHolder实例的这个方法中将fruit_item布局加载进来,然后创建一个ViewHolder实例,并把加载出来的布局传入构造函数当中,最后将ViewHolder的实例返回。
+     - onBindViewHolder()方法用于对RecyclerView子项的数据进行赋值,会在每个子项被滚动到屏幕内的时候执行,通过position参数得到当前项的Fruit实例,然后再将数据设置到ViewHolder的ImageView和TextView中。
+     - getItemCount()方法用于告诉RecyclerView一共有多少子项,直接返回数据源的长度。
+
+2. 使用RecyclerView，修改MainActivity
+
+   - ```java
+     public class MainActivity extends AppCompatActivity {
+         private List<Subwaystation> subwaystationList = new ArrayList<>();
+         @Override
+         protected void onCreate(Bundle savedInstanceState) {
+             super.onCreate(savedInstanceState);
+             setContentView(R.layout.activity_main);
+             initStation(); //
+             RecyclerView recyclerView = findViewById(R.id.recyclerView);
+             //LayoutManager 用于指定RecyclerView的布局方式
+             //LinearLayoutManager 线性布局
+             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+             //将LinearLayoutManager对象设置到RecyclerView中
+             recyclerView.setLayoutManager(layoutManager);
+             //将初始化的数据传入到stationAdapter
+             StationAdapter adapter = new StationAdapter(subwaystationList);
+             recyclerView.setAdapter(adapter); //完成适配器设置
+         }
+         //初始化所有车站
+         private void initStation() {
+             for (int i = 0; i < 2; i++) {
+                 ...
+             }
+         }
+     }
+     ```
+
+### 4.6.2 实现横向滚动和瀑布流布局
+
+1. 实现横向滚动
+
+   1. 先对station_item布局进行修改
+
+      - ```xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"  改为垂直方向排列
+            android:layout_width="100dp"    固定宽度 wrap导致长短不一 match导致占满屏幕
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/stationImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/> 水平居中
+            <TextView
+                android:id="@+id/stationName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"  水平居中
+                android:layout_marginTop="10dp"/>           图片和文字之间留点距离
+        </LinearLayout>
+        ```
+
+   2. 对MainActivity修改
+
+      - ```java
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+            initStation();
+            RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        	//创建LinearLayoutManager 并设置为横向排列
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        
+            recyclerView.setLayoutManager(layoutManager);
+            StationAdapter adapter = new StationAdapter(subwaystationList);
+            recyclerView.setAdapter(adapter);
+        }
+        ```
+
+------
+
+```Java
+/*参数：
+context – 当前上下文，将用于访问资源。
+spanCount – 网格中的列数或行数
+方向 - 布局方向。应该是HORIZONTAL或VERTICAL 。
+*/
+GridLayoutManager layoutManager1 = new GridLayoutManager(this,3);
+layoutManager1.setOrientation(GridLayoutManager.HORIZONTAL);
+```
+
+-----
+
+1. StaggeredGridLayoutManager实现瀑布流布局
+
+   - 修改station_item.xml
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:orientation="vertical"
+         android:layout_width="match_parent"  根据布局的列数自动适配
+         android:layout_height="wrap_content"
+         android:layout_margin="5dp">         子项之间的距离
+         <ImageView
+             android:id="@+id/stationImage"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"/>
+         <TextView
+             android:id="@+id/stationName"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="left"    左对齐 后面将文字的长度变长
+             android:layout_marginTop="10dp"/>
+     </LinearLayout>
+     ```
+
+2. 修改MainActivity
+
+   - ```Java
+     public class MainActivity extends AppCompatActivity {
+         private List<Subwaystation> subwaystationList = new ArrayList<>();
+         @Override
+         protected void onCreate(Bundle savedInstanceState) {
+             super.onCreate(savedInstanceState);
+             setContentView(R.layout.activity_main);
+             initStation();
+             RecyclerView recyclerView = findViewById(R.id.recyclerView);
+     		//参数1  指定布局的列数  参数2  指定布局的排列方向
+             StaggeredGridLayoutManager layoutManager2 = new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL);
+             
+             recyclerView.setLayoutManager(layoutManager2);
+             StationAdapter adapter = new StationAdapter(subwaystationList);
+             recyclerView.setAdapter(adapter);
+         }
+     
+         private void initStation() {
+             for (int i = 0; i < 2; i++) {
+                 Subwaystation songJiaZhuang  = new Subwaystation(getRandomLengthName("宋家庄"),R.drawable.ic_launcher_background);
+                 ...
+             }
+         }
+         //将名字长度设成不一致的  便于观察高度不一致
+         private String getRandomLengthName(String name){
+             Random random = new Random();
+             int length = random.nextInt(20) + 1;
+             StringBuilder builder = new StringBuilder();
+             for (int i = 0; i < length; i++) {
+                 builder.append(name);
+             }
+             return builder.toString();
+         }
+     }
+     ```
+
+   - <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220418141917475.png" alt="image-20220418141917475" style="zoom:50%;" />
+
+### 4.6.3 RecyclerView的点击事件
+
+RecyclerView并没有提供类似于setOnItemClickListener()这样的注册监听器方法,而是需要、给子项具体的View去注册点击事件。
+
+```Java
+public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHolder> {
+    private List<Subwaystation> mSubwaystations;
+
+    static class ViewHolder extends RecyclerView.ViewHolder{
+        View stationView; //保存子项最外层布局的实例
+        ImageView stationImage;
+        TextView stationName;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            stationView = itemView;
+            stationImage = itemView.findViewById(R.id.stationImage);
+            stationName = itemView.findViewById(R.id.stationName);
+        }
+    }
+    public StationAdapter(List<Subwaystation> subwaystations) {
+        mSubwaystations = subwaystations;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.station_item,parent,false);
+        final ViewHolder holder = new ViewHolder(view);
+        //给最外层布局注册点击事件
+        holder.stationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                Subwaystation subwaystation = mSubwaystations.get(position);
+                Toast.makeText(view.getContext(),"you click view" + subwaystation.getName(),Toast.LENGTH_SHORT).show();
+            }
+        });
+        //给图片注册点击事件
+        holder.stationImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                Subwaystation subwaystation = mSubwaystations.get(position);
+                Toast.makeText(view.getContext(),"you click image" + subwaystation.getName(),Toast.LENGTH_SHORT).show();
+            }
+        });
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+        Subwaystation subwaystation = mSubwaystations.get(position);
+        holder.stationImage.setImageResource(subwaystation.getImageId());
+        holder.stationName.setText(subwaystation.getName());
+    }
+
+    @Override
+    public int getItemCount() {
+        return mSubwaystations.size();
+    }
+}
+```
 
 ## 4.7 编写界面的最佳实践
+
+新创建一个UIBestPractice
+
+1. 编写主界面
+
+   - 修改activity_main.xml
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         xmlns:app="http://schemas.android.com/apk/res-auto"
+         xmlns:tools="http://schemas.android.com/tools"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:background="#d8e0e8"
+         tools:context=".MainActivity">
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/msgRecyclerView"
+             android:layout_width="match_parent"
+             android:layout_height="0dp"
+             android:layout_weight="1" />
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content" >
+             <EditText
+                 android:id="@+id/inputText"
+                 android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:layout_weight="1"
+                 android:hint="type something here"
+                 android:maxLines="2" />
+             <Button
+                 android:id="@+id/send"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="Send" />
+         </LinearLayout>
+     </LinearLayout>
+     ```
+
+   - RecyclerView 用于显示聊天的消息内容，EditText用于输入消息，Button用于发送消息
+
+2. 定义消息的实体类
+
+   - ```java
+     public class Msg {
+         public final static int TYPE_RECEIVED = 0;  //收到
+         public final static int TYPE_SENT = 1;      //发送
+         //表示消息的内容
+         private String content;
+         //表示消息的类型
+         private int type;
+     
+         public Msg(String content, int type) {
+             this.content = content;
+             this.type = type;
+         }
+     
+         public Msg() {
+         }
+     
+         public String getContent() {
+             return content;
+         }
+     
+         public int getType() {
+             return type;
+         }
+     }
+     ```
+
+3. 编写RecyclerView子项的布局  msg_item.xml
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:padding="10dp">
+     
+         <LinearLayout
+             android:id="@+id/leftLayout"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="left"
+             android:background="@drawable/message_left" >
+             <TextView
+                 android:id="@+id/leftMsg"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="center"
+                 android:layout_margin="10dp"
+                 android:textColor="#fff" />
+         </LinearLayout>
+     
+         <LinearLayout
+             android:id="@+id/rightLayout"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="right"
+             android:background="@drawable/message_right" >
+             <TextView
+                 android:id="@+id/rightMsg"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="center"
+                 android:layout_margin="10dp" />
+         </LinearLayout>
+     
+     </LinearLayout>
+     ```
+
+   - 收到消息左对齐，发出的消息右对齐
+
+4. 创建RecyclerView的适配器类  MsgAdapter
+
+   - ```Java
+     public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
+         private List<Msg> mMsgList;
+     
+         static class ViewHolder extends RecyclerView.ViewHolder{
+             LinearLayout leftLayout;
+             LinearLayout rightLayout;
+             TextView leftMsg;
+             TextView rightMsg;
+             public ViewHolder(@NonNull View itemView) {
+                 super(itemView);
+                 leftLayout = itemView.findViewById(R.id.leftLayout);
+                 rightLayout = itemView.findViewById(R.id.rightLayout);
+                 leftMsg = itemView.findViewById(R.id.leftMsg);
+                 rightMsg = itemView.findViewById(R.id.rightMsg);
+             }
+         }
+     
+         public MsgAdapter(List<Msg> mMsgList) {
+             this.mMsgList = mMsgList;
+         }
+     
+         @NonNull
+         @Override
+         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.msg_item,parent,false);
+             return new ViewHolder(view);
+         }
+     
+         @Override
+         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+             Msg msg = mMsgList.get(position);
+             if (msg.getType() == Msg.TYPE_RECEIVED) {
+                 //如果是收到的消息，显示左边的消息布局，右边的消息布局隐藏
+                 holder.leftLayout.setVisibility(View.VISIBLE);
+                 holder.rightLayout.setVisibility(View.GONE);
+                 holder.leftMsg.setText(msg.getContent());
+             }else if (msg.getType() == Msg.TYPE_SENT) {
+                 //如果是发出的消息，显示右边的消息布局，左边的消息布局隐藏
+                 holder.rightLayout.setVisibility(View.VISIBLE);
+                 holder.leftLayout.setVisibility(View.GONE);
+                 holder.rightMsg.setText(msg.getContent());
+             }
+         }
+         @Override
+         public int getItemCount() {
+             return mMsgList.size();
+         }
+     }
+     ```
+
+5. 修改MainActivity 
+
+   - ```Java
+     public class MainActivity extends AppCompatActivity {
+         private List<Msg> msgList = new ArrayList<>();
+         private EditText inputText;
+         private Button send;
+         private RecyclerView msgRecyclerView;
+         private MsgAdapter adapter;
+         @Override
+         protected void onCreate(Bundle savedInstanceState) {
+             super.onCreate(savedInstanceState);
+             setContentView(R.layout.activity_main);
+             initMsgs();
+             inputText = findViewById(R.id.inputText);
+             send = findViewById(R.id.send);
+             msgRecyclerView = findViewById(R.id.msgRecyclerView);
+             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+             msgRecyclerView.setLayoutManager(layoutManager);
+             adapter = new MsgAdapter(msgList);
+             msgRecyclerView.setAdapter(adapter);
+             send.setOnClickListener(new View.OnClickListener() {
+                 @Override
+                 public void onClick(View view) {
+                     String content = inputText.getText().toString();
+                     if (!"".equals(content)) {
+                         Msg msg = new Msg(content,Msg.TYPE_SENT);
+                         msgList.add(msg);
+                         adapter.notifyItemInserted(msgList.size() - 1);  //
+                         msgRecyclerView.scrollToPosition(msgList.size() - 1);    //
+                         inputText.setText("");  //清空输入框中的内容
+                     }
+                 }
+             });
+         }
+         private void initMsgs(){
+             Msg msg1 = new Msg("Hello guy!", Msg.TYPE_RECEIVED);
+             msgList.add(msg1);
+             Msg msg2 = new Msg("Hello! 你是谁？", Msg.TYPE_SENT);
+             msgList.add(msg2);
+             Msg msg3 = new Msg("我是哈哈哈，哈哈哈  哈哈哈哈", Msg.TYPE_RECEIVED);
+             msgList.add(msg3);
+         }
+     }
+     ```
+
+   - 
