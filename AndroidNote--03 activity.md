@@ -637,9 +637,11 @@ button1.setOnClickListener(new View.OnClickListener() {
 
 action  category是什么？怎么用？不用会怎么样？
 
-是标签，用于指明当前Activity可以响应``com.nyh.activitytest.ACTION_START``这个action,
+是标签，用于指明当前Activity可以响应``com.nyh.activitytest.ACTION_START``这个action,new Intent("指定action")
 
 ``<category>``也是标签，用于更精确地指明当前Activity能够响应的Intent中还可能带有的category。
+
+`intent.addCategory("category");`
 
 ### 3.3.3 更多隐式Intent的用法
 

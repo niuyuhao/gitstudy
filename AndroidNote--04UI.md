@@ -289,7 +289,7 @@ btn4.setOnClickListener(new View.OnClickListener() {
 progressDialog.dismiss();关闭对话框
 ```
 
-## 4.3 详解4种基本布局
+## 4.3 详解3种基本布局
 
 一个丰富的界面是由很多个控件组成的,需要借助布局来实现。布局是一种可用于放置很多控件的容器,它可以按照一定的规律调整内部控件的位置,从而编写出精美的界面。布局的内部除了放置控件外,也可以放置布局,通过多层布局的嵌套,就能够完成一些比较复杂的界面实现。
 
@@ -532,8 +532,6 @@ RelativeLayout通过相对定位的方式让控件出现在布局的任何位置
 使用``layout_gravity``指定对齐方式
 
 <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220414104958321.png" alt="image-20220414104958321" style="zoom:50%;" />
-
-### 4.3.4 百分比布局（build.gradle这个文件内容待学习）
 
 
 
