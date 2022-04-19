@@ -3,7 +3,7 @@
 ## 4.1 该如何编写程序界面
 
 写XML的好处是,不仅能够了解界面背后的实现原理,而且编写出来的界面还可以具备很好的屏幕适配性。
-全新的界面布局:ConstraintLayout。ConstraintLayout不是非常适合通过编写XML的方式来开发界面,而是更加适合在可视化编辑器中使用拖放控件的方式来进行操作,Android Studio中也提供了非常完备的可视化编辑器。
+*全新的界面布局:ConstraintLayout。ConstraintLayout不是非常适合通过编写XML的方式来开发界面,而是更加适合在可视化编辑器中使用拖放控件的方式来进行操作,Android Studio中也提供了非常完备的可视化编辑器。*
 
 ## 4.2 常用控件的使用方法
 
@@ -203,11 +203,11 @@ btn3.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
         //通过getVisibility()方法来判断ProgressBar是否可见
-        //可见就将ProgressBar隐藏
         if (progressBar.getVisibility() == View.GONE){
+        	//如果不可见就将ProgressBar显示出来
             progressBar.setVisibility(View.VISIBLE);
         } else {
-        //如果不可见就将ProgressBar显示出来    
+            //可见就将ProgressBar隐藏
             progressBar.setVisibility(View.GONE);
         }
     }

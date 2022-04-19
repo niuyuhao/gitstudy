@@ -1237,7 +1237,7 @@ protected void onDestroy() {
 
 ![singleTask模式下的打印日志](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220412150409056.png)
 
-在SecondActivity中启动FirstActivity时,会发现返回栈中已经存在一个FirstActivity的实例,并且是在SecondActivity的下面,于是SecondActivity会从返回栈中出栈,而FirstActivity重新成为了栈顶Activity,因此FirstActivity的onRestart()方法和SecondActivity的onDestroy()（这里tag内容应该是SecondActivity，手误打错了，结果还是正确的）方法会得到执行。现在返回栈中只剩下一个FirstActivity的实例了,按一下Back键就可以退出程序。
+在SecondActivity中启动FirstActivity时,会发现返回栈中已经存在一个FirstActivity的实例,并且是在SecondActivity的下面,于是SecondActivity会从返回栈中出栈,而FirstActivity重新成为了栈顶Activity,因此FirstActivity的onRestart()方法和SecondActivity的onDestroy()（**这里onDestroy应该是SecondActivity，手误打错了**）方法会得到执行。现在返回栈中只剩下一个FirstActivity的实例了,按一下Back键就可以退出程序。
 
 ![singleTask模式原理示意图](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220412150546383.png)
 

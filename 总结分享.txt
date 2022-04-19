@@ -1,0 +1,91 @@
+================================git==================================
+git 分布式的版本控制系统
+好处：通过git init将这个目录变成可以被git管理的仓库，之后里面每个文件的创建，修改，删除都可以追踪，并可以被还原。
+     可以将本地编辑的内容推送到远程仓库，不同的电脑可以将内容拉取下来；
+	1. HEAD、master 与 branch。
+		HEAD是指向当前commit的引用，每个仓库中只有一个HEAD。在每次提交时它都会自动向前移动到最新的commit。
+		master是git中的默认branch
+		branch是一类引用。head指向某个branch来间接指向commit。
+	2. push 的本质。
+		是把当前的分支上传到远程仓库，并把这个分支的路径上的所有commits也一并上传。
+	3. merge：合并 commits。
+		从要合并commit和当前commit（即HEAD所指向的commit）分叉的位置起，把要合并的commit的路径上的所有commit的内容一并应用到当前commit，然后自动生成一个新的commit。
+	4. Feature Branching：最流行的工作流。
+		任何新的功能（feature）或 bug 修复全都新建一个branch来写；
+		branch写完后，合并到master，然后删掉这个branch。
+	5. 关于 add。
+		add 添加的是文件的改动，而不是文件名
+-------------------------常用流程中的Git操作----------------------------
+  	1. rebase 与 merge。
+  		rebase：给commit序列重新设置基础点。把指定的commit以及它所在的commit串，以目标commit为基础，依次重新提交一次。
+ 	2. commit 后发现错误的修复。
+ 		1）最新的commit写错    git reset --hard HEAD^  git commit --amend
+ 		2）倒数第二个commit写错了  git rebase -i HEAD^^ > pick改成edit > 修改之后 commit --amend > rebase --continue
+ 		3）丢弃刚写的提交  git reset --hard 目标commit
+ 		4）丢弃不是最新的提交  git rebase -i HEAD^^ > 删除要撤销的commit > 修改冲突并提交 > git rebase --continue
+  	3. push 后发现错误的修复。
+  		1) 
+  		2) 
+  	4. 错误删除branch后恢复有用代码。
+  		git reflog 找到被删之前的commit ＞ git checkout commit ＞ git checkout -b branch再重新创建回来  
+  	5. 编码时候需要紧急切换分支如何操作。
+  		1）git add 之后 git stash 存一下正在进行的工作，操作完后，回到工作分支
+  		2）git stash list 查看储藏的工作现场
+  			①用git stash apply恢复，但是恢复后，stash内容并不删除，需要用git stash drop来删除；
+  			②用git stash pop，恢复的同时把stash内容也删了：
+
+难点：rebase
+==============================Activity================================
+Activity是什么？
+	Activity是一种可以包含用户界面的组件（在一个Activity中可以添加很多组件，这些组件负责具体的
+功能）,主要用于和用户进行交互。一个应用程序中可以包含零个或多个Activity。是手机或者平板电脑中的一个显示的屏幕。
+自己的理解：类比浏览器html页面，在html页面中也可以添加很多组件
+
+怎么用？
+	1.创建Activity
+	2.创建布局文件
+	3.在AndroidMainfest文件中注册
+		如果是主Activity，添加<intent-filter>标签，并在其中添加两行代码进行声明
+	4.销毁Activity可以使用Back，或者调用finish()方法
+
+	在Activity中使用Toast
+		Toast是什么？
+			Android系统提供的一种提醒方式，通知一些信息，这些信息在一段时间后会自动消失。
+		Toast怎么用？
+			调用Toast的makeText(参数1，参数2，参数3)方法之后再调用show方法。参数2是弹出的信息
+
+	Intent
+		是什么？
+			是Android程序中各组件之间进行交互的一种重要方式
+		怎么用？
+			1.new一个Intent，参数1：当前的Activity 参数2：要启动的Activity
+			2.调用startActivity()方法，传入创建好的Intent
+			--------------------------隐式Intent----------------------------
+			1.在注册Activity文件中，在Activity标签里配置action和category
+			2.new Intent时传入这个action并addCategory，添加category
+			----------------------------传递数据-----------------------------
+			1.通过putExtra()方法传递参数 第一个参数为key 									第二个为要传递的数据（自己的体会就是跟servlet里的request.setAttribute挺像）
+			2.getIntent()获取到用于启动的Intent，通过getXXXExtra("key")获取到传递的数据
+			----------------------------回传数据-----------------------------
+			用startActivityForResult(Intent,int)方法启动Activity，在启动的Activity(Intent的putExtra方法放数据和setResult方法传递回去)被销毁之前会回调调用者的onActivityResult()方法，
+			在该方法中通过requestCode判断是哪个活动的回调。
+Activity的生命周期
+通过栈来管理Activity，屏幕显示的是处于栈顶位置的Activity
+Activity状态
+	运行状态  -----> 处于栈顶
+	暂停状态  -----> 不再处于栈顶，但仍然可见的状态（比如：启动对话框）
+	停止状态  -----> 不再处于栈顶，并且被其他Activity所覆盖，完全不可见的状态
+	销毁状态  -----> 从栈中移除的状态
+生命周期
+	onCreate()  ----->  Activity第一次被创建时候调用
+	onStart()   ----->  Activity由不可见变为可见时被调用
+	onResume()  ----->  Activity处于栈顶时
+	onPause()   ----->  去启动或者恢复另一个Activity的时候调用
+	onStop()    ----->  完全不可见时
+	onRestart() ----->  重新启动Activity时
+	onDestroy() ----->  Activity被销毁之前
+Activity的启动模式
+	standard    ----->  不论Activity是否已经在返回栈中存在,每次启动都会创建一个该Activity的新实例
+	singleTop   ----->  在启动Activity时如果发现返回栈的栈顶已经是该Activity,则直接使用,不会再创建
+	singleTask  ----->  启动前检查是否已经存在，存在就直接使用，并把在这个Activity之上的所有其他Activity统统出栈；没有则创建
+	singleInstance  ----->  启用一个新的返回栈来管理这个Activity
