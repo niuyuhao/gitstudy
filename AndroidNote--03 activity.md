@@ -417,8 +417,7 @@ Toast的用法:通过静态方法makeText()创建出一个Toast对象,然后调�
 
 ### 3.2.5 在Activity中使用Menu
 
-首先在res目录下新建一个menu文件夹,右击res目录→New→Directory,输入文件夹
-名“menu”,点击“OK”。接着在这个文件夹下新建一个名叫“main”的菜单文件,右击menu文件夹→New→Menu resource file。
+首先在res目录下新建一个menu文件夹,右击res目→New→Directory,输入文件夹名“menu”,点击“OK”。接着在这个文件夹下新建一个名叫“main”的菜单文件,右击menu文件夹→New→Menu resource file。
 
 在main.xml中添加如下代码
 ```xml
