@@ -88,4 +88,4 @@ Activity的启动模式
 	standard    ----->  不论Activity是否已经在返回栈中存在,每次启动都会创建一个该Activity的新实例
 	singleTop   ----->  在启动Activity时如果发现返回栈的栈顶已经是该Activity,则直接使用,不会再创建
 	singleTask  ----->  启动前检查是否已经存在，存在就直接使用，并把在这个Activity之上的所有其他Activity统统出栈；没有则创建
-	singleInstance  ----->  启用一个新的返回栈来管理这个Activity
+	
