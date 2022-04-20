@@ -24,8 +24,8 @@ git 分布式的版本控制系统
  		3）丢弃刚写的提交  git reset --hard 目标commit
  		4）丢弃不是最新的提交  git rebase -i HEAD^^ > 删除要撤销的commit > 修改冲突并提交 > git rebase --continue
   	3. push 后发现错误的修复。
-  		1) 
-  		2) 
+  		1) 出错的内容在自己的branch  把写错的commit修改或者删除  -f 强制push
+  		2) 出错的内容已经合并到master  git revert commit
   	4. 错误删除branch后恢复有用代码。
   		git reflog 找到被删之前的commit ＞ git checkout commit ＞ git checkout -b branch再重新创建回来  
   	5. 编码时候需要紧急切换分支如何操作。
@@ -39,7 +39,6 @@ git 分布式的版本控制系统
 Activity是什么？
 	Activity是一种可以包含用户界面的组件（在一个Activity中可以添加很多组件，这些组件负责具体的
 功能）,主要用于和用户进行交互。一个应用程序中可以包含零个或多个Activity。是手机或者平板电脑中的一个显示的屏幕。
-自己的理解：类比浏览器html页面，在html页面中也可以添加很多组件
 
 怎么用？
 	1.创建Activity
@@ -64,7 +63,7 @@ Activity是什么？
 			1.在注册Activity文件中，在Activity标签里配置action和category
 			2.new Intent时传入这个action并addCategory，添加category
 			----------------------------传递数据-----------------------------
-			1.通过putExtra()方法传递参数 第一个参数为key 									第二个为要传递的数据（自己的体会就是跟servlet里的request.setAttribute挺像）
+			1.通过putExtra()方法传递参数 第一个参数为key 	第二个为要传递的数据
 			2.getIntent()获取到用于启动的Intent，通过getXXXExtra("key")获取到传递的数据
 			----------------------------回传数据-----------------------------
 			用startActivityForResult(Intent,int)方法启动Activity，在启动的Activity(Intent的putExtra方法放数据和setResult方法传递回去)被销毁之前会回调调用者的onActivityResult()方法，
@@ -88,4 +87,4 @@ Activity的启动模式
 	standard    ----->  不论Activity是否已经在返回栈中存在,每次启动都会创建一个该Activity的新实例
 	singleTop   ----->  在启动Activity时如果发现返回栈的栈顶已经是该Activity,则直接使用,不会再创建
 	singleTask  ----->  启动前检查是否已经存在，存在就直接使用，并把在这个Activity之上的所有其他Activity统统出栈；没有则创建
-	
+	singleInstance  ----->  启用一个新的返回栈来管理这个Activity
