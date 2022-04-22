@@ -31,14 +31,15 @@ git 分布式的版本控制系统
   	5. 编码时候需要紧急切换分支如何操作。
   		1）git add 之后 git stash 存一下正在进行的工作，操作完后，回到工作分支
   		2）git stash list 查看储藏的工作现场
-  			①用git stash apply恢复，但是恢复后，stash内容并不删除，需要用git stash drop来删除；
+  			①用git stash apply恢复，但是恢复后，stash内容并不删除，需要用git stash drop来删除；（分支之后 再stash）
   			②用git stash pop，恢复的同时把stash内容也删了：
 
-难点：rebase
+难点：rebase  场景
 ==============================Activity================================
 Activity是什么？
 	Activity是一种可以包含用户界面的组件（在一个Activity中可以添加很多组件，这些组件负责具体的
 功能）,主要用于和用户进行交互。一个应用程序中可以包含零个或多个Activity。是手机或者平板电脑中的一个显示的屏幕。
+https://www.runoob.com/w3cnote/android-tutorial-activity.html
 
 怎么用？
 	1.创建Activity

@@ -355,9 +355,10 @@ Activity是一种可以包含用户界面的组件（在一个Activity中可以�
         <activity
             android:name=".FirstActivity"
             android:label="This is FirstActivity"
-            android:exported="true" >
+            android:exported="true" >能被替他应用打开
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                主入口launcher
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -1478,3 +1479,4 @@ button1.setOnClickListener(new OnClickListener(){
 
 [(57条消息) 对于Android虚拟机启动失败“The emulator process for AVD Nexus_5X_API_30 was killed”的解决方案_卉卉今天喝水了吗的博客-CSDN博客](https://blog.csdn.net/weixin_46523794/article/details/116156366)
 
+singleTop  singleTask 场景
