@@ -853,6 +853,9 @@ public class MainActivity extends AppCompatActivity {
 
 ### 问题：适配器？
 
+`//参数3  false 表示只让父布局中声明的layout属性生效，但不为这个view添加父布局`???
+`View view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false); `
+
 ### 4.5.3 提升ListView的运行效率
 
 在StationAdapter的getView()方法中，每次都将布局重新加载了一遍，当ListView快速滚动的时候，可能会成为性能的瓶颈。
@@ -1465,8 +1468,8 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHold
                      if (!"".equals(content)) {
                          Msg msg = new Msg(content,Msg.TYPE_SENT);
                          msgList.add(msg);
-                         adapter.notifyItemInserted(msgList.size() - 1);  //
-                         msgRecyclerView.scrollToPosition(msgList.size() - 1);    //
+                         adapter.notifyItemInserted(msgList.size() - 1);  //用于通知列表有新的数据插入，这样新增的数据才能够在RecyclerView中显示
+                         msgRecyclerView.scrollToPosition(msgList.size() - 1);    //将显示的数据定位到最后一行，保证可以看到最后一条发出的消息
                          inputText.setText("");  //清空输入框中的内容
                      }
                  }
