@@ -289,6 +289,684 @@ LeftFragment leftFragment = (LeftFragment) getSupportFragmentManager().findFragm
 
 ## 5.3 Fragment的生命周期
 
+### 5.3.1 Fragment的状态和回调
+
+|   状态   |                             描述                             |
+| :------: | :----------------------------------------------------------: |
+| 运行状态 | 当一个Fragment所关联的Activity正处于运行状态时,该Fragment也处于运行状态。 |
+| 暂停状态 | 当一个Activity进入暂停状态时(由于另一个未占满屏幕的Activity被添加到了栈顶),与它相关联的Fragment就会进入暂停状态。 |
+| 停止状态 | 当一个Activity进入停止状态时,与它相关联的Fragment就会进入停止状态,或者通过调用FragmentTransaction的remove()、replace()方法将Fragment从Activity中移除,但在事务提交之前调用了addToBackStack()方法,这时的Fragment也会进入停止状态。总的来说,进入停止状态的Fragment对用户来说是完全不可见的,有可能会被系统回收。 |
+| 销毁状态 | Fragment总是依附于Activity而存在,因此当Activity被销毁时,与它相关联的Fragment就会进入销毁状态。或者通过调用FragmentTransaction的remove()、replace()方法将Fragment从Activity中移除,但在事务提交之前并没有调用addToBackStack()方法,这时的Fragment也会进入销毁状态。 |
+
+|       方法名        |                       描述                       |
+| :-----------------: | :----------------------------------------------: |
+|     onAttach()      |        当Fragment和Activity建立关联时调用        |
+|   onCreateView()    |        为Fragment创建视图(加载布局)时调用        |
+| onActivityCreated() | 确保与Fragment相关联的Activity已经创建完毕时调用 |
+|   onDestroyView()   |        当与Fragment关联的视图被移除时调用        |
+|     onDetach()      |        当Fragment和Activity解除关联时调用        |
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424134446264.png" alt="Fragment完整的生命周期" style="zoom:33%;" />
+
+
+
+### 5.3.2 体验Fragment的生命周期
+
+在FragmentTest中修改RightFragment中的代码
+
+```Java
+public class RightFragment extends Fragment {
+    public static final String TAG = "RightFragment";
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG,"--------onAttach---------");
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG,"--------onCreate---------");
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG,"--------onCreateView---------");
+        View view = inflater.inflate(R.layout.right_fragment, container, false);
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG,"--------onActivityCreated---------");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG,"--------onStart---------");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG,"--------onResume---------");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG,"--------onPause---------");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG,"--------onStop---------");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG,"--------onDestroyView---------");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG,"--------onDestroy---------");
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(TAG,"--------onDetach---------");
+    }
+}
+```
+
+当RightFragment第一次被加载到屏幕上时,会依次执行onAttach()、onCreate()、onCreateView()、onActivityCreated()、onStart()和onResume()方法。
+
+![启动程序时的打印日志](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424140253062.png)
+
+然后点击LeftFragment中的按钮，由于AnotherRightFragment替换了RightFragment,此时的RightFragment进入了停止状态,因此onPause()、onStop()和onDestroyView()方法会得到执行。
+
+![替换成AnotherRightFragment时的打印日志](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424140340752.png)
+
+- 如果在替换的时候没有调用addToBackStack()方法,此时的RightFragment就会进入销毁状态,onDestroy()和onDetach()方法就会得到执行。
+- ![image-20220424142157054](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424142157054.png)
+
+按下Back键,RightFragment会重新回到屏幕，由于RightFragment重新回到了运行状态,因此onCreateView()、
+onActivityCreated()、onStart()和onResume()方法会得到执行。注意,此时onCreate()方法并不会执行,因为我们借助了addToBackStack()方法使得RightFragment并没有被销毁。
+
+![返回RightFragment时的打印日志](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424140436843.png)
+
+再次按下Back键，依次执行onPause()、onStop()、onDestroyView()、onDestroy()和onDetach()方法,最终将Fragment销毁。
+
+![退出程序时的打印日志](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424140711821.png)
+
+
+
 ## 5.4 动态加载布局的技巧
 
-## 5.5 Fragment的最佳实践
+程序根据设备的分辨率或屏幕大小,在运行时决定加载哪个布局
+
+### 5.4.1 使用限定符
+
+借助限定符(qualifier)实现在运行时判断程序应该是使用双页模式还是单页模式呢。
+
+修改FragmentTest项目中的activity_main.xml文件  只留一个左侧Fragment，让其充满整个父布局。
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <fragment
+        android:id="@+id/left_fragment"
+        android:name="com.nyh.fragmenttest.LeftFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
+```
+
+在res目录下新建layout-large文件夹，新建一个activity_main.xml布局文件    包含两个碎片
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <fragment
+        android:id="@+id/left_fragment"
+        android:name="com.nyh.fragmenttest.LeftFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+
+    <fragment
+        android:id="@+id/right_fragment"
+        android:name="com.nyh.fragmenttest.RightFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3" />
+
+</LinearLayout>
+```
+
+然后将MainActivity中replaceFragment()方法里的代码注释掉，在平板上运行
+
+<img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424145438678.png" alt="image-20220424145438678" style="zoom:50%;" />
+
+在手机上运行
+
+![image-20220424145522079](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220424145522079.png)
+
+常见的限定符
+
+| 屏幕特征 | 限定符 |                     描述                      |
+| :------: | :----: | :-------------------------------------------: |
+|   大小   | small  |            提供给小屏幕设备的资源             |
+|          | normal |           提供给中等屏幕设备的资源            |
+|          | large  |            提供给大屏幕设备的资源             |
+|          | xlarge |           提供给超大屏幕设备的资源            |
+|  分辨率  |  ldpi  |     提供给低分辨率设备的资源(120 dpi以下)     |
+|          |  mdpi  |  提供给中等分辨率设备的资源(120 dpi~160 dpi)  |
+|          |  hdpi  |   提供给高分辨率设备的资源(160 dpi~240 dpi)   |
+|          | xhdpi  |  提供给超高分辨率设备的资源(240 dpi~320 dpi)  |
+|          | xxhdpi | 提供给超超高分辨率设备的资源(320 dpi~480 dpi) |
+|   方向   |  land  |             提供给横屏设备的资源              |
+|          |  port  |             提供给竖屏设备的资源              |
+
+### 5.4.2 使用最小宽度限定符
+
+使用最小宽度限定符(smallest-width qualifier)，更加灵活地为不同设备加载布局,不管它们是不是被系统认定为large。最小宽度限定符允许**对屏幕的宽度指定一个最小值(以dp为单位),然后以这个最小值为临界点,屏幕宽度大于这个值的设备就加载一个布局,屏幕宽度小于这个值的设备就加载另一个布局**。
+
+在res目录下新建layout-sw600dp文件夹,然后在这个文件夹下新建activity_main.xml布局
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fragment
+        android:id="@+id/leftFrag"
+        android:name="com.nyh.fragmenttest.LeftFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <fragment
+        android:id="@+id/rightFrag"
+        android:name="com.nyh.fragmenttest.RightFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3" />
+
+</LinearLayout>
+```
+
+这就意味着,当程序运行在屏幕宽度大于等于600 dp的设备上时,会加载layout-sw600dp/activity_main布局,当程序运行在屏幕宽度小于600 dp的设备上时,则仍然加载默认的layout/activity_main布局。
+
+## 5.5 Fragment的最佳实践----简易版的新闻应用
+
+1. 新建新闻实体类News
+
+   - ```Java
+     public class News {
+         private String title;
+         private String content;
+     
+         public String getTitle() {
+             return title;
+         }
+     
+         public void setTitle(String title) {
+             this.title = title;
+         }
+     
+         public String getContent() {
+             return content;
+         }
+     
+         public void setContent(String content) {
+             this.content = content;
+         }
+     }
+     ```
+
+2. 新建布局文件news_content_frag.xml
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent">
+     
+         <LinearLayout
+             android:id="@+id/visibility_layout"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical"
+             android:visibility="invisible" >
+             <!--新闻标题-->
+             <TextView
+                 android:id="@+id/news_title"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:gravity="center"
+                 android:padding="10dp"
+                 android:textSize="20sp" />
+             <!--使用一条细线分割-->
+             <View
+                 android:layout_width="match_parent"
+                 android:layout_height="1dp"
+                 android:background="#000" />
+             <!--新闻内容-->
+             <TextView
+                 android:id="@+id/news_content"
+                 android:layout_width="match_parent"
+                 android:layout_height="0dp"
+                 android:layout_weight="1"
+                 android:padding="15dp"
+                 android:textSize="18sp" />
+     
+         </LinearLayout>
+         <View
+             android:layout_width="1dp"
+             android:layout_height="match_parent"
+             android:layout_alignParentLeft="true"
+             android:background="#000" />
+     </RelativeLayout>
+     ```
+
+   - 新闻内容的布局主要可以分为两个部分，头部部分显示新闻标题，正文部分显示新闻内容，中间使用一条细线分隔开。这里的细线是利用View来实现的，将Vicw的宽或高设置为1dp，再通过background属性给细线设置一下颜色就可以了。这里设置成黑色。
+
+3. 新建一个NewsContentFragment类，继承Fragment
+
+   - ```Java
+     public class NewsContentFragment extends Fragment {
+         private View view;
+         @Nullable
+         @Override
+         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+             view = inflater.inflate(R.layout.news_content_frag,container,false);
+             return view;
+         }
+         public void refresh(String newsTitle,String newsContent){
+             View visibilityLayout = view.findViewById(R.id.visibility_layout);
+             visibilityLayout.setVisibility(View.VISIBLE);
+             TextView newsTitleText = view.findViewById(R.id.news_title);
+             TextView newsContentText = view.findViewById(R.id.news_content);
+             newsTitleText.setText(newsTitle);    //刷新新闻标题
+             newsContentText.setText(newsContent);//  刷新新闻内容
+     
+         }
+     }
+     ```
+
+   - onCreateView方法里加载了上一步创建的news_content_frag这个布局。refresh方法，这个方法用于将新闻的标题和内容显示在页面上。
+
+   - 到这就把新闻内容的碎片和布局都创建好了，这是在双页模式下使用的。
+
+4. 在单页模式下使用，再创建一个活动  NewsContentActivity，将布局名制定成news_content，修改布局文件中的内容
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         xmlns:app="http://schemas.android.com/apk/res-auto"
+         xmlns:tools="http://schemas.android.com/tools"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         tools:context=".NewsContentActivity">
+         <fragment
+             android:id="@+id/news_content_fragment"
+             android:name="com.nyh.fragmentbestpractice.NewsContentFragment"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent" />
+     </LinearLayout>
+     ```
+
+   - 直接在布局中引入了上一步创建的NewsContentFragment，相当于把news_content_frag布局的内容自动加了进来。
+
+5. 修改 NewsContentActivity 中的代码
+
+   - ```Java
+     public class NewsContentActivity extends AppCompatActivity {
+     
+         public static void actionStart(Context context,String newsTitle,String newsContent){
+             Intent intent = new Intent(context, NewsContentActivity.class);
+             intent.putExtra("news_title",newsTitle);
+             intent.putExtra("news_content",newsContent);
+             context.startActivity(intent);
+         }
+     
+         @Override
+         protected void onCreate(Bundle savedInstanceState) {
+             super.onCreate(savedInstanceState);
+             setContentView(R.layout.news_content);
+             //获取传入的新闻标题
+             String newsTitle = getIntent().getStringExtra("news_title");
+             //获取传入的新闻内容
+             String newsContent = getIntent().getStringExtra("news_content");
+             NewsContentFragment newsContentFragment = (NewsContentFragment) getSupportFragmentManager().findFragmentById(R.id.news_content_fragment);
+             newsContentFragment.refresh(newsTitle,newsContent);  //刷新NewsContentFragment界面
+         }
+     }
+     ```
+
+   - 在onCreate方法中通过Intent获取到了传入的新闻标题和新闻内容；然后获取到NewsContentFragment的实例，然后调用它的refresh方法，将获取到的新闻标题和新闻内容传入。
+
+     - actionStart方法   ---》 启动活动的最佳写法（Activity笔记中）
+
+6. 再创建一个用于显示新闻列表的布局  news_title_frag.xml
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         android:orientation="vertical"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent">
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/news_title_recycler_view"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent" />
+     </LinearLayout>
+     ```
+
+   - 里面只有一个用于显示新闻列表的RecyclerView。
+
+7. 创建news_item.xml作为RecyclerView子项的布局
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <!--
+         android:singleLine="true"    表示让这个TextView只能单行显示
+         android:ellipsize="end"      用于设定当文本内容超出控件宽度时，文本的缩略方式，end表示在尾部进行缩略
+         android:padding      表示给控件的周围加上补白，这样不至于让文本内容会紧靠在边缘上
+     -->
+     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+         android:id="@+id/news_title"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:singleLine="true"
+         android:ellipsize="end"
+         android:textSize="18sp"
+         android:paddingLeft="10dp"
+         android:paddingRight="10dp"
+         android:paddingTop="15dp"
+         android:paddingBottom="15dp">
+     </TextView>
+     ```
+
+   - 属性
+
+     - android:padding      表示给控件的周围加上补白，这样不至于让文本内容会紧靠在边缘上
+     - android:singleLine="true"    表示让这个TextView只能单行显示
+     - android:ellipsize="end"      用于设定当文本内容超出控件宽度时，文本的缩略方式，end表示在尾部进行缩略
+
+8. 新建NewsTitleFragment 作为展示新闻列表的碎片
+
+   - ```Java
+     public class NewsTitleFragment extends Fragment {
+         private boolean isTwopage;
+     
+         @Nullable
+         @Override
+         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+             View view = inflater.inflate(R.layout.news_title_frag, container, false);
+             return view;
+         }
+     
+         @Override
+         public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+             super.onActivityCreated(savedInstanceState);
+             if (getActivity().findViewById(R.id.news_content_layout)!= null){
+                 isTwopage = true;  //找到news_content_fragment布局时，为双页模式
+             } else {
+                 isTwopage = false; //找不到为单页模式
+             }
+         }
+     }
+     
+     ```
+
+   - 在onCreateView方法中，加载news_title_frag布局。
+
+   - 在onActivityCreated中通过能否找到一个id为news_content_layout的view来判断当前是双页模式还是单页模式
+
+     1. 先修改activity_main.xml
+
+        - ```xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/news_title_layout"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context=".MainActivity">
+          
+              <fragment
+                  android:id="@+id/news_title_fragment"
+                  android:name="com.nyh.fragmentbestpractice.NewsTitleFragment"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent" />
+          </FrameLayout>
+          ```
+
+        - 表示单页模式下，只会加载一个新闻标题的碎片
+
+     2. 新建layout-sw600dp文件夹，在这个文件夹下再新建一个activity_main.xml
+
+        - ```xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context=".MainActivity">
+          
+              <fragment
+                  android:id="@+id/news_title_fragment"
+                  android:name="com.nyh.fragmentbestpractice.NewsTitleFragment"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent"
+                  android:layout_weight="1"/>
+              <FrameLayout
+                  android:id="@+id/news_content_layout"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent"
+                  android:layout_weight="3" >
+                  <fragment
+                      android:id="@+id/news_content_fragment"
+                      android:name="com.nyh.fragmentbestpractice.NewsContentFragment"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent" />
+              </FrameLayout>
+          </LinearLayout>
+          ```
+
+        - 双页模式下引入了两个碎片，并将新闻内容的碎片放在FrameLayout布局下，布局id为news_content_layout。能够找到这个id的时候就是双页模式
+
+9. 在NewsTitleFragment中通过RecyclerView将新闻列表展示出来
+
+   1. 新建一个内部类NewsAdapter作为RecyclerView的适配器
+
+      - ```java
+        public class NewsTitleFragment extends Fragment {
+            private boolean isTwopage;
+            ...
+            class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
+                private List<News> mNewsList;
+        
+                class ViewHolder extends RecyclerView.ViewHolder{
+                    TextView newsTitleText;
+        
+                    public ViewHolder(@NonNull View itemView) {
+                        super(itemView);
+                        newsTitleText = itemView.findViewById(R.id.news_title);
+                    }
+                }
+        
+                public NewsAdapter(List<News> newsList) {
+                    mNewsList = newsList;
+                }
+        
+                @NonNull
+                @Override
+                public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item,parent,false);
+                    final ViewHolder holder = new ViewHolder(view);
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            News news = mNewsList.get(holder.getAdapterPosition());
+                            if (isTwopage) {
+                                //如果是双页模式，则刷新NewsContentFragment中的内容
+                                NewsContentFragment newsContentFragment = (NewsContentFragment) getFragmentManager().findFragmentById(R.id.news_content_fragment);
+                                newsContentFragment.refresh(news.getTitle(),news.getContent());
+                            } else {
+                                //如果是单页模式，则直接启动NewsContentActivity
+                                NewsContentActivity.actionStart(getActivity(),news.getTitle(),news.getContent());
+                            }
+                        }
+                    });
+                    return holder;
+                }
+        
+                @Override
+                public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+                    News news = mNewsList.get(position);
+                    holder.newsTitleText.setText(news.getTitle());
+                }
+        
+                @Override
+                public int getItemCount() {
+                    return mNewsList.size();
+                }
+            }
+        }
+        
+        ```
+
+      - 这里写成内部类的好处就是可以直接访问NewsTitleFragment的变量,比如isTwoPane。onCreateViewHolder()方法中注册的点击事件,首先获取了点击项的News实例,然后通过isTwoPane变量判断当前是单页还是双页模式。如果是单页模式,就启动一个新的Activity去显示新闻内容;如果是双页模式,就更新NewsContentFragment里的数据。
+
+10. 想RecyclerView中填充数据，修改NewsTitleFragment
+
+    - ```java
+      public class NewsTitleFragment extends Fragment {
+          private boolean isTwopage;
+      
+          @Nullable
+          @Override
+          public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+              View view = inflater.inflate(R.layout.news_title_frag, container, false);
+              RecyclerView newsTitleRecyclerView = view.findViewById(R.id.news_title_recycler_view);
+              LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+              newsTitleRecyclerView.setLayoutManager(layoutManager);
+              NewsAdapter adapter = new NewsAdapter(getNews());
+              newsTitleRecyclerView.setAdapter(adapter);
+              return view;
+          }
+      
+          @Override
+          public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+              super.onActivityCreated(savedInstanceState);
+              if (getActivity().findViewById(R.id.news_content_layout)!= null){
+                  isTwopage = true;  //找到news_content_fragment布局时，为双页模式
+              } else {
+                  isTwopage = false; //找不到为单页模式
+              }
+          }
+      
+          class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
+              private List<News> mNewsList;
+      
+              class ViewHolder extends RecyclerView.ViewHolder{
+                  TextView newsTitleText;
+      
+                  public ViewHolder(@NonNull View itemView) {
+                      super(itemView);
+                      newsTitleText = itemView.findViewById(R.id.news_title);
+                  }
+              }
+      
+              public NewsAdapter(List<News> newsList) {
+                  mNewsList = newsList;
+              }
+      
+              @NonNull
+              @Override
+              public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                  View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item,parent,false);
+                  final ViewHolder holder = new ViewHolder(view);
+                  view.setOnClickListener(new View.OnClickListener() {
+                      @Override
+                      public void onClick(View view) {
+                          News news = mNewsList.get(holder.getAdapterPosition());
+                          if (isTwopage) {
+                              //如果是双页模式，则刷新NewsContentFragment中的内容
+                              NewsContentFragment newsContentFragment = (NewsContentFragment) getFragmentManager().findFragmentById(R.id.news_content_fragment);
+                              newsContentFragment.refresh(news.getTitle(),news.getContent());
+                          } else {
+                              //如果是单页模式，则直接启动NewsContentActivity
+                              NewsContentActivity.actionStart(getActivity(),news.getTitle(),news.getContent());
+                          }
+                      }
+                  });
+                  return holder;
+              }
+      
+              @Override
+              public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+                  News news = mNewsList.get(position);
+                  holder.newsTitleText.setText(news.getTitle());
+              }
+      
+              @Override
+              public int getItemCount() {
+                  return mNewsList.size();
+              }
+          }
+      
+      
+          private List<News> getNews(){
+              List<News> newsList = new ArrayList<>();
+              for (int i = 0; i <= 50; i++) {
+                  News news = new News();
+                  news.setTitle("this is news title" + i);
+                  news.setContent(getRandomLengthContent("this is news content" + i + "."));
+                  newsList.add(news);
+              }
+              return newsList;
+          }
+      
+          private String getRandomLengthContent(String content) {
+              Random random = new Random();
+              int length = random.nextInt(20) + 1;
+              StringBuilder builder = new StringBuilder();
+              for (int i = 0; i < length; i++) {
+                  builder.append(content);
+              }
+              return builder.toString();
+          }
+      ```
+
+
+
+
+
