@@ -341,9 +341,9 @@ add 添加的是文件的改动，而不是文件名
 
 `master 分支的 git merge xx分支 = xx分支的git rebase master + master分支 git merge xx分支`
 
-### [rebase和merge的区别](https://blog.csdn.net/michaelshare/article/details/79108233)
+### [rebase和merge的区别](https://blog.csdn.net/michaelshare/article/details/79108233)（？）
 
-1. merge能够体现出时间线，但是rebase会打乱时间线。
+1. merge能够体现出时间线，但是rebase会打乱时间线。（时间线）
 2. 而rebase看起来简洁，但是merge看起来不太简洁。
 3. 最终结果是都把代码合起来了
 
