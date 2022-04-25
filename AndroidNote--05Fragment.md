@@ -2,7 +2,11 @@
 
 ## 5.1 Fragment是什么
 
-*Fragment是Android3.0后引入的一个新的API，他出现的初衷是为了适应大屏幕的平板电脑， 当然现在他仍然是平板APP UI设计的宠儿，而且我们普通手机开发也会加入这个Fragment， 我们可以把他看成一个小型的Activity，又称Activity片段！如果一个很大的界面，就一个布局，写起界面会麻烦，而且如果组件多的话是管理起来也很麻烦！而使用Fragment 我们可以把屏幕划分成几块，然后进行分组，进行一个模块化的管理！从而可以更加方便的在 运行过程中动态地更新Activity的用户界面！另外Fragment并不能单独使用，他需要嵌套在Activity 中使用，尽管他拥有自己的生命周期，但是还是会受到宿主Activity的生命周期的影响，比如Activity 被destory销毁了，他也会跟着销毁！*[菜鸟教程](https://www.runoob.com/w3cnote/android-tutorial-fragment-base.html)
+*Fragment是Android3.0后引入的一个新的API，他出现的初衷是**为了适应大屏幕的平板电脑**， 当然现在他仍然是平板APP UI设计的宠儿，而且我们普通手机开发也会加入这个Fragment， 我们可以把他**看成一个小型的Activity，又称Activity片段**！如果一个很大的界面，就一个布局，写起界面会麻烦，而且如果组件多的话是管理起来也很麻烦！而使用Fragment 我们可以把屏幕划分成几块，然后进行分组，进行一个模块化的管理！从而可以更加方便的在 运行过程中动态地更新Activity的用户界面！另外Fragment并不能单独使用，他需要嵌套在Activity 中使用，尽管他拥有自己的生命周期，但是还是会受到宿主Activity的生命周期的影响，比如Activity 被destory销毁了，他也会跟着销毁！*
+
+[菜鸟教程](https://www.runoob.com/w3cnote/android-tutorial-fragment-base.html)
+
+[官方文档](https://developer.android.com/guide/components/fragments.html)
 
 ![Fragment分别对应手机与平板间不同情况的处理图](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/41442282.jpg)
 
@@ -94,7 +98,13 @@
      </LinearLayout>
      ```
 
-   - 
+
+总结
+
+1. 定义Fragment的布局，就是fragment显示内容的
+2. 自定义一个Fragment类,需要继承Fragment或者他的子类,重写onCreateView()方法 在该方法中调用:inflater.inflate()方法加载Fragment的布局文件,接着返回加载的view对象
+3. 在需要加载Fragment的Activity对应的布局文件中添加fragment的标签，name属性是全限定类名（包含Fragment的包名）
+4. Activity在onCreate( )方法中调用setContentView()加载布局文件
 
 ### 5.2.2 动态添加Fragment
 
@@ -188,7 +198,7 @@
      2. 获取FragmentManager，在活动中可以直接通过调用getSupportFragmentManager()方法得到
      3. 开启一个事务，通过调用beginTransaction()方法开启
      4. 向容器内添加或替换碎片，一般使用replace()方法实现，需要传入容器的id和待添加的碎片实例
-     5. 提交事物，调用commit()方法实现
+     5. 提交事务，调用commit()方法实现
 
 ### 5.2.3 在Fragment中实现返回栈
 
@@ -200,7 +210,7 @@
 
 在提交事务之前，调用了FragmentTransaction的addToBackStack()方法，它可以接收一个名字用于描述返回栈的状态，一般传入null即可。
 
-### 5.2.4 Fragment和Activity之间进行交互
+### 5.2.4 Fragment和Activity之间进行交互（有疑问）
 
 ![img](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/45971686.jpg)
 
