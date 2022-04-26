@@ -1326,6 +1326,19 @@ protected void onCreate(Bundle savedInstanceState) {
 
 ![singleInstance模式原理示意图](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220412154003670.png)
 
+### singleTop和singleTask场景
+
+- singleTop ：
+  - 通知消息打开的页面
+  - 耗时操作打开的页面
+  - 登录页面
+  - APP接收到多条推送消息，点开不同消息，均由同一实例展示。singleTop适合接收推送通知的内容显示页面。例如，某个新闻客户端的新闻内容页面，如果收到10个新闻推送，每次都打开一个新闻内容页面是很烦人的。
+- singleTask ：
+  - 大多数APP的主页
+  - 应用APP的主界面（Fragment的containerActivity）。singleTask适合作为程序入口点。例如淘宝的主界面，在淘宝陆续打开商品搜索界面、商品详细界面、订单界面、付款成功界面后，在付款成功界面一键返回主界面。
+- SingleInstance：
+  - 如APP经常调用的拨打电话、系统通讯录、系统Launcher、锁屏键、来电显示等系统应用。singleInstance适合需要与程序分离开的页面。例如闹铃提醒，将闹铃提醒与闹铃设置分离。singleInstance不要用于中间页面，如果用于中间页面，跳转会有问题，比如：A -> B (singleInstance) -> C，完全退出后，在此启动，首先打开的是B。
+
 ## 3.6 Activity的最佳实践
 
 ### 3.6.1 知道当前是在哪一个Activity

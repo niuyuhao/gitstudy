@@ -976,7 +976,600 @@ onActivityCreated()、onStart()和onResume()方法会得到执行。注意,此�
           }
       ```
 
+## 熟练Fragment-01
 
+![img](https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/53574832.jpg)
 
+1. 写下底部选项的一些资源文件
 
+   - 图片Drawable资源：**tab_menu_channel.xml**
 
+     - ```xml
+       <?xml version="1.0" encoding="utf-8"?>
+       <selector xmlns:android="http://schemas.android.com/apk/res/android">
+           <item android:drawable="@mipmap/tab_channel_pressed" android:state_selected="true" />
+           <item android:drawable="@mipmap/tab_channel_normal" />
+       </selector>
+       ```
+
+   - 文字资源：**tab_menu_text.xml**
+
+     - ```xml
+       <?xml version="1.0" encoding="utf-8"?>
+       <selector xmlns:android="http://schemas.android.com/apk/res/android">
+           <item android:color="@color/text_yellow" android:state_selected="true" />
+           <item android:color="@color/text_gray" />
+       </selector>
+       ```
+
+   - 背景资源：**tab_menu_bg.xml**
+
+     - ```xml
+       <?xml version="1.0" encoding="utf-8"?>
+       <selector xmlns:android="http://schemas.android.com/apk/res/android">
+           <item android:state_selected="true">
+               <shape>
+                   <solid android:color="#FFC4C4C4" />
+               </shape>
+           </item>
+           <item>
+               <shape>
+                   <solid android:color="@color/transparent" />
+               </shape>
+           </item>
+       </selector>
+       ```
+
+2. 编写Activity布局
+
+   - ```xml
+     <?xml version="1.0" encoding="utf-8"?>
+     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+         xmlns:app="http://schemas.android.com/apk/res-auto"
+         xmlns:tools="http://schemas.android.com/tools"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         tools:context=".MainActivity">
+     
+     <!--
+         首先定义顶部标题栏的样式，48dp的LinearLayout中间加上一个TextView作为标题！
+         接着定义一个大小为56dp的LinerLayout对齐底部，在这个里面加入四个TextView，比例1:1:1:1， 并且设置相关属性，接着在这个LinearLayout上加一条线段！
+         最后以标题栏和底部导航栏为边界，写一个FrameLayout，宽高match_parent，用做Fragment的容器！
+     -->
+     
+         <RelativeLayout
+             android:id="@+id/ly_top_bar"
+             android:layout_width="match_parent"
+             android:layout_height="48dp"
+             android:background="@color/bg_topbar">
+     
+             <TextView
+                 android:id="@+id/txt_topbar"
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:layout_centerInParent="true"
+                 android:gravity="center"
+                 android:text="信息"
+                 android:textColor="@color/text_topbar"
+                 android:textSize="18sp" />
+     
+             <View
+                 android:layout_width="match_parent"
+                 android:layout_height="2px"
+                 android:layout_alignParentBottom="true"
+                 android:background="@color/div_white" />
+         </RelativeLayout>
+     
+         <LinearLayout
+             android:id="@+id/ly_tab_bar"
+             android:layout_width="match_parent"
+             android:layout_height="56dp"
+             android:layout_alignParentBottom="true"
+             android:background="@color/bg_white"
+             android:orientation="horizontal">
+     
+             <TextView
+                 android:id="@+id/txt_channel"
+                 android:layout_width="0dp"
+                 android:layout_height="match_parent"
+                 android:layout_weight="1"
+                 android:background="@drawable/tab_menu_bg"
+                 android:drawablePadding="3dp"
+                 android:drawableTop="@drawable/tab_menu_channel"
+                 android:gravity="center"
+                 android:padding="5dp"
+                 android:text="@string/tab_menu_alert"
+                 android:textColor="@drawable/tab_menu_text"
+                 android:textSize="16sp" />
+     
+             <TextView
+                 android:id="@+id/txt_message"
+                 android:layout_width="0dp"
+                 android:layout_height="match_parent"
+                 android:layout_weight="1"
+                 android:background="@drawable/tab_menu_bg"
+                 android:drawablePadding="3dp"
+                 android:drawableTop="@drawable/tab_menu_message"
+                 android:gravity="center"
+                 android:padding="5dp"
+                 android:text="@string/tab_menu_profile"
+                 android:textColor="@drawable/tab_menu_text"
+                 android:textSize="16sp" />
+     
+             <TextView
+                 android:id="@+id/txt_better"
+                 android:layout_width="0dp"
+                 android:layout_height="match_parent"
+                 android:layout_weight="1"
+                 android:background="@drawable/tab_menu_bg"
+                 android:drawablePadding="3dp"
+                 android:drawableTop="@drawable/tab_menu_better"
+                 android:gravity="center"
+                 android:padding="5dp"
+                 android:text="@string/tab_menu_pay"
+                 android:textColor="@drawable/tab_menu_text"
+                 android:textSize="16sp" />
+     
+             <TextView
+                 android:id="@+id/txt_setting"
+                 android:layout_width="0dp"
+                 android:layout_height="match_parent"
+                 android:layout_weight="1"
+                 android:background="@drawable/tab_menu_bg"
+                 android:drawablePadding="3dp"
+                 android:drawableTop="@drawable/tab_menu_setting"
+                 android:gravity="center"
+                 android:padding="5dp"
+                 android:text="@string/tab_menu_setting"
+                 android:textColor="@drawable/tab_menu_text"
+                 android:textSize="16sp"/>
+     
+         </LinearLayout>
+     
+         <!-- 在底部导航栏上方 android:layout_above="@id/ly_tab_bar" -->
+         <View
+             android:id="@+id/div_tab_bar"
+             android:layout_width="match_parent"
+             android:layout_height="2px"
+             android:background="@color/div_white"
+             android:layout_above="@id/ly_tab_bar"/>
+     
+         <!-- 在顶部下方 android:layout_below="@id/ly_top_bar" -->
+         <FrameLayout
+             android:id="@+id/ly_content"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_above="@id/div_tab_bar"
+             android:layout_below="@id/ly_top_bar"></FrameLayout>
+     </RelativeLayout>
+     ```
+
+3. 隐藏顶部导航栏
+
+   1. 把 requestWindowFeature(Window.FEATURE_NO_TITLE);放在super.onCreate(savedInstanceState);
+   2. 接着**AndroidManifest.xml**设置下theme属性 `android:theme="@style/Theme.AppCompat.NoActionBar"`
+
+4. 创建一个Fragment的简单布局与类
+
+   - fg_content.xml
+
+     - ```xml
+       <?xml version="1.0" encoding="utf-8"?>
+       <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+           android:orientation="vertical"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:background="@color/bg_white">
+           <TextView
+               android:id="@+id/txt_content"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:gravity="center"
+               android:text="哈哈"
+               android:textColor="@color/text_yellow"
+               android:textSize="20sp" />
+       </LinearLayout>
+       ```
+
+   - MyFragment.java
+
+     - ```java
+       public class MyFragment extends Fragment {
+           private String content;
+           public MyFragment(String content) {
+               this.content = content;
+           }
+       
+           @Override
+           public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+               View view = inflater.inflate(R.layout.fg_content,container,false);
+               TextView txt_content = (TextView) view.findViewById(R.id.txt_content);
+               txt_content.setText(content);
+               return view;
+           }
+       }
+       ```
+
+5. 编写MainActivity
+
+   - 问题
+
+     - Fragment什么时候初始化和add到容器中？什么时候hide和show？
+     - 如何让TextView被选中？选中一个TextView后，要做一些什么操作？
+     - 刚进入MainActivity怎么样让一个TextView处于Selected的状态？
+
+   - 解决
+
+     1. 选中TextView后对对应的Fragment进行判空，如果为空，初始化，并添加到容器中； 而hide的话，定义一个方法hide所有的Fragment，每次触发点击事件就先调用这个hideAll方法，将所有Fragment隐藏起来，然后如果TextView对应的Fragment不为空，我们就将这个Fragment显示出来；
+     2. 通过点击事件来实现，点击TextView后先重置所有TextView的选中状态为false，然后设置点击的 TextView的选中状态为true；
+     3. 是通过点击事件来设置选中的，在onCreate()方法里加个触发点击事件的方法(模拟一次点击)  txt_channel.performClick();
+
+   - ```Java
+     public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+     
+         //UI Object
+         private TextView txt_topbar;
+         private TextView txt_channel;
+         private TextView txt_message;
+         private TextView txt_better;
+         private TextView txt_setting;
+         private FrameLayout ly_content;
+     
+         //Fragment Object
+         private MyFragment fg1,fg2,fg3,fg4;
+         private FragmentManager fManager;
+     
+         @Override
+         protected void onCreate(Bundle savedInstanceState) {
+             super.onCreate(savedInstanceState);
+             requestWindowFeature(Window.FEATURE_NO_TITLE);
+             setContentView(R.layout.activity_main);
+             fManager = getSupportFragmentManager();
+             bindViews();
+             txt_channel.performClick();   //模拟一次点击，既进去后选择第一项
+         }
+     
+         //UI组件初始化与事件绑定
+         private void bindViews() {
+             txt_topbar = (TextView) findViewById(R.id.txt_topbar);
+             txt_channel = (TextView) findViewById(R.id.txt_channel);
+             txt_message = (TextView) findViewById(R.id.txt_message);
+             txt_better = (TextView) findViewById(R.id.txt_better);
+             txt_setting = (TextView) findViewById(R.id.txt_setting);
+             ly_content = (FrameLayout) findViewById(R.id.ly_content);
+     
+             txt_channel.setOnClickListener(this);
+             txt_message.setOnClickListener(this);
+             txt_better.setOnClickListener(this);
+             txt_setting.setOnClickListener(this);
+         }
+     
+         //重置所有文本的选中状态
+         private void setSelected(){
+             txt_channel.setSelected(false);
+             txt_message.setSelected(false);
+             txt_better.setSelected(false);
+             txt_setting.setSelected(false);
+         }
+     
+         //隐藏所有Fragment
+         private void hideAllFragment(FragmentTransaction fragmentTransaction){
+             if(fg1 != null)fragmentTransaction.hide(fg1);
+             if(fg2 != null)fragmentTransaction.hide(fg2);
+             if(fg3 != null)fragmentTransaction.hide(fg3);
+             if(fg4 != null)fragmentTransaction.hide(fg4);
+         }
+     
+     
+         @Override
+         public void onClick(View v) {
+             FragmentTransaction fTransaction = fManager.beginTransaction();
+             hideAllFragment(fTransaction);
+             switch (v.getId()){
+                 case R.id.txt_channel:
+                     setSelected();
+                     txt_channel.setSelected(true);
+                     if(fg1 == null){
+                         fg1 = new MyFragment("第一个Fragment");
+                         fTransaction.add(R.id.ly_content,fg1);
+                     }else{
+                         fTransaction.show(fg1);
+                     }
+                     break;
+                 case R.id.txt_message:
+                     setSelected();
+                     txt_message.setSelected(true);
+                     if(fg2 == null){
+                         fg2 = new MyFragment("第二个Fragment");
+                         fTransaction.add(R.id.ly_content,fg2);
+                     }else{
+                         fTransaction.show(fg2);
+                     }
+                     break;
+                 case R.id.txt_better:
+                     setSelected();
+                     txt_better.setSelected(true);
+                     if(fg3 == null){
+                         fg3 = new MyFragment("第三个Fragment");
+                         fTransaction.add(R.id.ly_content,fg3);
+                     }else{
+                         fTransaction.show(fg3);
+                     }
+                     break;
+                 case R.id.txt_setting:
+                     setSelected();
+                     txt_setting.setSelected(true);
+                     if(fg4 == null){
+                         fg4 = new MyFragment("第四个Fragment");
+                         fTransaction.add(R.id.ly_content,fg4);
+                     }else{
+                         fTransaction.show(fg4);
+                     }
+                     break;
+             }
+             fTransaction.commit();
+         }
+     }
+     ```
+
+   - 注意
+
+     - FragmentTransaction只能使用一次，每次使用都要调用FragmentManager 的beginTransaction()方法获得FragmentTransaction事务对象
+
+## 熟练Fragment-02(使用*RadioGroup + RadioButton来实现01*)
+
+一个RadioGroup包着四个RadioButton，和前面一样用比例来划分:1:1:1:1；
+只需重写RadioGroup的onCheckedChange，判断checkid即可知道点击的是哪个RadioButton	
+
+实现流程
+
+将drawable类的资源都是将selected 状态修改成checked
+
+1. 底部选项的资源文件
+
+   1. 图片
+
+      - ```xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:drawable="@mipmap/tab_channel_pressed" android:state_checked="true" />
+            <item android:drawable="@mipmap/tab_channel_normal" />
+        </selector>
+        ```
+
+      - 其他三个同样
+
+   2. 文字
+
+      - ```xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:color="@color/text_yellow" android:state_checked="true" />
+            <item android:color="@color/text_gray" />
+        </selector>
+        ```
+
+   3. 背景
+
+      - ```xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <selector xmlns:android="http://schemas.android.com/apk/res/android">
+            <item android:state_selected="true">
+                <shape>
+                    <solid android:color="#FFC4C4C4" />
+                </shape>
+            </item>
+            <item>
+                <shape>
+                    <solid android:color="@color/transparent" />
+                </shape>
+            </item>
+        </selector>
+        ```
+
+2. 编写Activity布局
+
+   1. 取出一个RadioGroup标签
+
+      - ```xml
+        <RadioButton
+                    android:id="@+id/rb_channel"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/tab_menu_bg"
+                    android:button="@null"
+                    android:drawableTop="@drawable/tab_menu_channel"
+                    android:gravity="center"
+                    android:paddingTop="3dp"
+                    android:text="@string/tab_menu_alert"
+                    android:textColor="@drawable/tab_menu_text"
+                    android:textSize="18sp" />
+        ```
+
+   2. 把每个相同RadioButton都相同的属性抽取出来，写到styles.xml中
+
+      - ```xml
+        <style name="tab_menu_item">
+                <item name="android:layout_width">0dp</item>
+                <item name="android:layout_weight">1</item>
+                <item name="android:layout_height">match_parent</item>
+                <item name="android:background">@drawable/tab_menu_bg</item>
+                <item name="android:button">@null</item>
+                <item name="android:gravity">center</item>
+                <item name="android:paddingTop">3dp</item>
+                <item name="android:textColor">@drawable/tab_menu_text</item>
+                <item name="android:textSize">18sp</item>
+            </style>
+        ```
+
+      - 然后activity_main.xml中的RadioButton就不用每次都写相同的代码了， 只要在RadioButton中添上**style="@style/tab_menu_item"**就可以了
+
+      - ```xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity">
+            <RelativeLayout
+                android:id="@+id/ly_top_bar"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/bg_topbar">
+        
+                <TextView
+                    android:id="@+id/txt_topbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:text="信息"
+                    android:textColor="@color/text_topbar"
+                    android:textSize="18sp" />
+        
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/div_white" />
+        
+            </RelativeLayout>
+        
+            <RadioGroup
+                android:id="@+id/rg_tab_bar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/bg_white"
+                android:orientation="horizontal">
+        
+                <RadioButton
+                    android:id="@+id/rb_channel"
+                    style="@style/tab_menu_item"
+                    android:drawableTop="@drawable/tab_menu_channel"
+                    android:text="@string/tab_menu_alert" />
+        
+                <RadioButton
+                    android:id="@+id/rb_message"
+                    style="@style/tab_menu_item"
+                    android:drawableTop="@drawable/tab_menu_message"
+                    android:text="@string/tab_menu_profile" />
+        
+                <RadioButton
+                    android:id="@+id/rb_better"
+                    style="@style/tab_menu_item"
+                    android:drawableTop="@drawable/tab_menu_better"
+                    android:text="@string/tab_menu_pay" />
+        
+                <RadioButton
+                    android:id="@+id/rb_setting"
+                    style="@style/tab_menu_item"
+                    android:drawableTop="@drawable/tab_menu_setting"
+                    android:text="@string/tab_menu_setting"/>
+        
+            </RadioGroup>
+        
+            <View
+                android:id="@+id/div_tab_bar"
+                android:layout_width="match_parent"
+                android:layout_height="2px"
+                android:layout_above="@id/rg_tab_bar"
+                android:background="@color/div_white" />
+        
+            <FrameLayout
+                android:id="@+id/ly_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/div_tab_bar"
+                android:layout_below="@id/ly_top_bar"></FrameLayout>
+        </RelativeLayout>
+        ```
+
+3. 隐藏顶部导航栏
+
+   - **AndroidManifest.xml设置下theme属性**
+
+     ```xml
+     android:theme="@style/Theme.AppCompat.NoActionBar"
+     ```
+
+4. 复制01中的Fragment的简单布局和类
+
+5. 编写MainActivity
+
+   - ```Java
+     public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener{
+     
+         private RadioGroup rg_tab_bar;
+         private RadioButton rb_channel;
+     
+         //Fragment Object
+         private MyFragment fg1,fg2,fg3,fg4;
+         private FragmentManager fManager;
+     
+         @Override
+         protected void onCreate(Bundle savedInstanceState) {
+             super.onCreate(savedInstanceState);
+             setContentView(R.layout.activity_main);
+             fManager = getSupportFragmentManager();
+             rg_tab_bar = (RadioGroup) findViewById(R.id.rg_tab_bar);
+             rg_tab_bar.setOnCheckedChangeListener(this);
+             //获取第一个单选按钮，并设置其为选中状态
+             rb_channel = (RadioButton) findViewById(R.id.rb_channel);
+             rb_channel.setChecked(true);
+         }
+     
+     
+         @Override
+         public void onCheckedChanged(RadioGroup group, int checkedId) {
+             FragmentTransaction fTransaction = fManager.beginTransaction();
+             hideAllFragment(fTransaction);
+             switch (checkedId){
+                 case R.id.rb_channel:
+                     if(fg1 == null){
+                         fg1 = new MyFragment("第一个Fragment");
+                         fTransaction.add(R.id.ly_content,fg1);
+                     }else{
+                         fTransaction.show(fg1);
+                     }
+                     break;
+                 case R.id.rb_message:
+                     if(fg2 == null){
+                         fg2 = new MyFragment("第二个Fragment");
+                         fTransaction.add(R.id.ly_content,fg2);
+                     }else{
+                         fTransaction.show(fg2);
+                     }
+                     break;
+                 case R.id.rb_better:
+                     if(fg3 == null){
+                         fg3 = new MyFragment("第三个Fragment");
+                         fTransaction.add(R.id.ly_content,fg3);
+                     }else{
+                         fTransaction.show(fg3);
+                     }
+                     break;
+                 case R.id.rb_setting:
+                     if(fg4 == null){
+                         fg4 = new MyFragment("第四个Fragment");
+                         fTransaction.add(R.id.ly_content,fg4);
+                     }else{
+                         fTransaction.show(fg4);
+                     }
+                     break;
+             }
+             fTransaction.commit();
+         }
+     
+         //隐藏所有Fragment
+         private void hideAllFragment(FragmentTransaction fragmentTransaction){
+             if(fg1 != null)fragmentTransaction.hide(fg1);
+             if(fg2 != null)fragmentTransaction.hide(fg2);
+             if(fg3 != null)fragmentTransaction.hide(fg3);
+             if(fg4 != null)fragmentTransaction.hide(fg4);
+         }
+     
+     }
+     ```
