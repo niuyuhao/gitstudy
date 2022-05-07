@@ -170,5 +170,445 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
 ## 6.3 发送自定义广播
 
+如何在应用程序中发送自定义的广播。广播主要分为两种类型：标准广播和有序广播，在本节中通过实践的方式来看一下这两种广播具体的区别。
+
+### 6.3.1 发送标准广播
+
+在发送广播之前，需要先定义一个广播接收器来准备接收此广播才行。新建一个MyBroadcastReceiver
+
+```Java
+public class MyBroadcastReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Toast.makeText(context,"received in MyBroadcastReceiver",Toast.LENGTH_SHORT).show();
+    }
+}
+```
+
+当MyBroadcastReceiver收到自定义的广播时,就会弹出“received in MyBroadcastReceiver”的提示。
+然后在AndroidManifest.xml中对这个BroadcastReceiver进行修改
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.nyh.broadcasttest">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.BroadcastTest">
+	...
+        <receiver
+            android:name=".MyBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.nyh.broadcasttest.MY_BROADCAST" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
+```
+
+MyBroadcastReceiver接收一条值为com.example.broadcasttest.MY_BROADCAST的广播,因此待会儿在发送广播的时候,就需要发出这样的一条广播。
+接下来修改activity_main.xml中的代码,如下所示:
+
+```Java
+public class MainActivity extends AppCompatActivity {
+
+    private IntentFilter intentFilter;
+    private NetworkChangeReceiver networkChangeReceiver;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        networkChangeReceiver = new NetworkChangeReceiver();
+        registerReceiver(networkChangeReceiver,intentFilter);
+
+        Button btn = findViewById(R.id.btn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent("com.nyh.broadcasttest.MY_BROADCAST");
+                intent.setPackage("com.nyh.broadcasttest");
+                sendBroadcast(intent);
+                Log.d("test","--------1--------");
+            }
+        });
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkChangeReceiver);
+    }
+
+    class NetworkChangeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connectionManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectionManager.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isAvailable()){
+                Toast.makeText(context,"network is available",Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(context,"network is unavailable",Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
+}
+```
+
+在按钮的点击事件里面加入了发送自定义广播的逻辑。
+
+首先构建了一个Intent对象,并把要发送的广播的值传入。然后调用Intent的setPackage()方法,并传入当前应用程序的包名。最后调用sendBroadcast()方法将广播发送出去,这样所有监听com.example.broadcasttest.MY_BROADCAST这条广播的BroadcastReceiver就会收到消息了。此时发出去的广播就是一条标准广播。
+
+对第2步调用的setPackage()方法进行更详细的说明。前面已经说过,在Android8.0系统之后,静态注册的BroadcastReceiver是无法接收隐式广播的,而默认情况下我们发出的自定义广播恰恰都是隐式广播。因此这里一定要调用setPackage()方法,指定这条广播是发送给哪个应用程序的,从而让它变成一条显式广播,否则静态注册的BroadcastReceiver将无法接收到这条广播。
+
+### 6.3.2 发送有序广播
+
+和标准广播不同,有序广播是一种同步执行的广播,并且是可以被截断的。为了验证这一点,再创建一个新的BroadcastReceiver。新建AnotherBroadcastReceiver,代码如下所示:
+
+```Java
+public class AnotherBroadcastReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Toast.makeText(context,"received in AnotherBroadcastReceiver",Toast.LENGTH_SHORT).show();
+    }
+}
+```
+
+然后在AndroidManifest.xml中对这个BroadcastReceiver的配置进行修改
+
+```xml
+<receiver
+android:name=".AnotherBroadcastReceiver"
+android:enabled="true"
+android:exported="true">
+<intent-filter>
+<action android:name="com.example.broadcasttest.MY_BROADCAST" />
+</intent-filter>
+</receiver>
+```
+
+AnotherBroadcastReceiver同样接收的是com.example.broadcasttest.MY_BROADCAST这条广播。现在重新运行程序,并点击“Send Broadcast”按钮,就会分别弹出两次提示信息
+
+不过,到目前为止,程序发出的都是标准广播,现在尝试一下发送有序广播。重新回到BroadcastTest项目,然后修改MainActivity中的代码,如下所示:
+
+```Java
+btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent("com.nyh.broadcasttest.MY_BROADCAST");
+                intent.setPackage("com.nyh.broadcasttest");
+//                发送标准广播
+                //                sendBroadcast(intent);
+//                发送有序广播
+                sendOrderedBroadcast(intent,null);
+                
+            }
+        });
+```
+
+发送有序广播只需要改动一行代码,即将sendBroadcast()方法改成sendOrderedBroadcast()方法。sendOrderedBroadcast()方法接收两个参数:
+
+第一个参数仍然是Intent;
+
+第二个参数是一个与权限相关的字符串,这里传入null就行了。
+
+现在重新运行程序,并点击“Send Broadcast”按钮,两个BroadcastReceiver仍然都可以收到这条广播。
+看上去好像和标准广播并没有什么区别。不过这个时候的BroadcastReceiver是有先后顺序的,而且前面的BroadcastReceiver还可以将广播截断,以阻止其继续传播。
+
+在注册的时候设定BroadcastReceiver的先后顺序，修改AndroidManifest.xml中的代码,如下所示
+
+```xml
+<receiver
+android:name=".MyBroadcastReceiver"
+android:enabled="true"
+android:exported="true">
+<intent-filter android:priority="100">
+<action android:name="com.example.broadcasttest.MY_BROADCAST"/>
+</intent-filter>
+</receiver>
+```
+
+通过android:priority属性给BroadcastReceiver设置了优先级,优先级比较高的BroadcastReceiver就可以先收到广播。这里将MyBroadcastReceiver的优先级设成了100,以保证它一定会在AnotherBroadcastReceiver之前收到广播。既然已经获得了接收广播的优先权,那么MyBroadcastReceiver就可以选择是否允许广播继续传递了。修改MyBroadcastReceiver中的代码,如下所示:
+
+```Java
+public class MyBroadcastReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Toast.makeText(context,"received in MyBroadcastReceiver",Toast.LENGTH_SHORT).show();
+        //如果在onReceive()方法中调用了abortBroadcast()方法,就表示将这条广播截断,后面的BroadcastReceiver将无法再接收到这条广播。
+        abortBroadcast();
+    }
+}
+```
+
+
+
 ## 6.4 广播的最佳实践
 
+强制下线应该算是一个比较常见的功能,比如如果你的QQ号在别处登录了,就会将你强制挤下线。实现强制下线功能的思路:**在界面上弹出一个对话框,让用户无法进行任何其他操作,必须点击对话框中的“确定”按钮,然后回到登录界面**。可是这样就会存在一个问题:当用户被通知需要强制下线时,可能正处于任何一个界面,难道要在每个界面上都编写一个弹出对话框的逻辑?如果你真的这么想,那思路就偏远了。我们完全可以借助本章所学的广播知识,非常轻松地实现这一功能。新建一个BroadcastBestPractice项目,然后开始动手吧。
+
+强制下线功能需要先关闭所有的Activity,然后回到登录界面。在第3章的最佳实践部分已经实现过关闭所有Activity的功能了,因此这里使用同样的方案即可。先创建一个ActivityCollector类用于管理所有的Activity,代码如下所示:
+
+```java
+public class ActivityController {
+    public static List<Activity> activities = new ArrayList<>();
+
+    public static void addActivity(Activity activity){
+        activities.add(activity);
+    }
+    public static void removeActivity(Activity activity){
+        activities.remove(activity);
+    }
+    public static void finishAll() {
+        for (Activity activity : activities) {
+            if (!activity.isFinishing()){
+                activity.finish();
+            }
+        }
+    }
+}
+```
+
+然后创建BaseActivity类作为所有Activity的父类,代码如下所示
+
+```java
+public class BaseActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ActivityController.addActivity(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ActivityController.removeActivity(this);
+    }
+}
+```
+
+首先需要创建一个LoginActivity来作为登录界面,并让Android Studio帮我们自动生成相应的布局文件。然后编辑布局文件activity_login.xml,代码如下所示
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+    <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+    <TextView
+    android:layout_width="90dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:textSize="18sp"
+    android:text="Account:" />
+    <EditText
+    android:id="@+id/accountEdit"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_gravity="center_vertical" />
+    </LinearLayout>
+    <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+    <TextView
+    android:layout_width="90dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:textSize="18sp"
+    android:text="Password:" />
+    <EditText
+    android:id="@+id/passwordEdit"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_gravity="center_vertical"
+    android:inputType="textPassword" />
+    </LinearLayout>
+    <Button
+    android:id="@+id/login"
+    android:layout_width="200dp"
+    android:layout_height="60dp"
+    android:layout_gravity="center_horizontal"
+    android:text="Login" />
+</LinearLayout>
+```
+
+这里我们使用LinearLayout编写了一个登录布局,最外层是一个纵向的LinearLayout,里面包含了3行直接子元素。第一行是一个横向的LinearLayout,用于输入账号信息;第二行也是一个横向的LinearLayout,用于输入密码信息;第三行是一个登录按钮。
+
+接下来修改LoginActivity中的代码,如下所示
+
+```java
+public class LoginActivity extends BaseActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        accountEdit = findViewById(R.id.accountEdit);
+        passwordEdit = findViewById(R.id.passwordEdit);
+        login = findViewById(R.id.login);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String account = accountEdit.getText().toString();
+                String password = passwordEdit.getText().toString();
+                if (account.equals("root") && password.equals("123456")){
+                    Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(LoginActivity.this,"account or password is invalid",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+}
+```
+
+这里模拟了一个非常简单的登录功能。首先将LoginActivity的继承结构改成继承自BaseActivity,然后在登录按钮的点击事件里对输入的账号和密码进行判断:如果登录成功就跳转到MainActivity,否则就提示用户账号或密码错误。
+将MainActivity理解成是登录成功后进入的程序主界面,这里在主界面只加入强制下线功能。
+
+修改activity_main.xml中的代码,如下所示:
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent" >
+    <Button
+    android:id="@+id/forceOffline"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Send force offline broadcast" />
+</LinearLayout>
+```
+
+只有一个按钮用于触发强制下线功能。然后修改MainActivity中的代码,如下所示
+
+```Java
+public class MainActivity extends BaseActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Button btn = findViewById(R.id.force_offline);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent("com.nyh.broadcastbestpractice.FORCE_OFFLINE");
+                sendBroadcast(intent);
+            }
+        });
+    }
+}
+```
+
+在按钮的点击事件里发送了一条广播,广播的值为com.example.broadcastbestpractice.FORCE_OFFLINE,这条广播就是用于通知程序强制用户下线的。也就是说,强制用户下线的逻辑并不是写在MainActivity里的,而是应该写在接收这条广播的BroadcastReceiver里。这样强制下线的功能就不会依附于任何界面了,不管是在程序的任何地方,只要发出这样一条广播,就可以完成强制下线的操作了。
+那么接下来就创建一个BroadcastReceiver来接收这条强制下线广播。
+
+问题,应该在哪里创建呢?由于BroadcastReceiver中需要弹出一个对话框来阻塞用户的正常操作,但如果创建的是一个静态注册的BroadcastReceiver,是没有办法在onReceive()方法里弹出对话框这样的UI控件的,而我们显然也不可能在每个Activity中都注册一个动态的BroadcastReceiver。
+需要在BaseActivity中动态注册一个BroadcastReceiver就可以了,因为所有的Activity都继承自BaseActivity。
+修改BaseActivity中的代码,如下所示:
+
+```Java
+public class BaseActivity extends AppCompatActivity {
+
+    private ForceOfflineReceiver receiver;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ActivityController.addActivity(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.nyh.broadcastbestpractice.FORCE_OFFLINE");
+        receiver = new ForceOfflineReceiver();
+        registerReceiver(receiver,intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (receiver != null){
+            unregisterReceiver(receiver);
+            receiver = null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ActivityController.removeActivity(this);
+    }
+    class ForceOfflineReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Warning");
+            builder.setMessage("you are forced to be offline. Please try to login again.");
+            builder.setCancelable(false);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityController.finishAll(); //销毁所有Activity
+                    Intent intent = new Intent(context, LoginActivity.class);
+                    context.startActivity(intent);  //重新启动 LoginActivity
+                }
+            });
+            builder.show();
+        }
+    }
+}
+```
+
+先来看一下ForceOfflineReceiver中的代码,这次onReceive()方法里可不再是仅仅弹出一个Toast了,而是加入了较多的代码,那我们就来仔细看看吧。首先是使用AlertDialog.Builder构建一个对话框。注意,这里一定要调用setCancelable()方法将对话框设为不可取消,否则用户按一下Back键就可以关闭对话框继续使用程序了。然后使用setPositiveButton()方法给对话框注册确定按钮,当用户点击了“OK”按钮时,就调用ActivityCollector的finishAll()方法销毁所有Activity,并重新启动LoginActivity。
+
+再来看一下是怎么注册ForceOfflineReceiver这个BroadcastReceiver的。可以看到,这里重写了onResume()和onPause()这两个生命周期方法,然后分别在这两个方法里注册和取消注册了ForceOfflineReceiver。
+
+为什么要这样写?之前不都是在onCreate()和onDestroy()方法里注册和取消注册BroadcastReceiver的?
+
+这是因为始终需要保证只有处于栈顶的Activity才能接收到这条强制下线广播,非栈顶的Activity不应该也没必要接收这条广播,所以写在onResume()和onPause()方法里就可以很好地解决这个问题,当一个Activity失去栈顶位置时就会自动取消BroadcastReceiver的注册。
+这样的话,所有强制下线的逻辑就已经完成了,接下来我们还需要对AndroidManifest.xml文件进行修改,代码如下所示:
+
+```xml
+<activity
+          android:name=".LoginActivity"
+          android:exported="true" >
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+```
+
+这里只需要对一处代码进行修改,就是将主Activity设置为LoginActivity,而不再是MainActivity。
