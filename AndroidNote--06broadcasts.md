@@ -19,9 +19,13 @@ Android内置了很多系统级别的广播,可以在应用程序中通过监听
 
 ### 6.2.1 动态注册监听网络变化
 
-广播接收器可以自由地对根据自己感兴趣的广播进行注册,这样当有相应的广播发出时,相应的BroadcastReceiver就能够收到该广播,并可以在内部进行逻辑处理。注册BroadcastReceiver（广播接收器）的方式一般有两种:在代码中注册和在AndroidManifest.xml中注册。前者也被称为动态注册,后者也被称为静态注册。
+**广播接收器可以自由地对根据自己感兴趣的广播进行注册,这样当有相应的广播发出时,相应的BroadcastReceiver就能够收到该广播,并可以在内部进行逻辑处理。**注册BroadcastReceiver（广播接收器）的方式一般有两种:
 
-如何创建一个BroadcastReceiver?新建一个类,让它继承自BroadcastReceiver,并重写父类的onReceive()方法。这样当有广播到来时,onReceive()方法就会得到执行,具体的逻辑就可以在这个方法中处理。下面先通过动态注册的方式编写一个能够监听网络变化的程序,借此学习一下BroadcastReceiver的基本用法。新建一个BroadcastTest项目,然后修改MainActivity中的代码,如下所示:
+在代码中注册和在AndroidManifest.xml中注册。前者也被称为动态注册,后者也被称为静态注册。
+
+如何创建一个BroadcastReceiver?
+
+新建一个类,让它继承自BroadcastReceiver,并重写父类的onReceive()方法。这样当有广播到来时,onReceive()方法就会得到执行,具体的逻辑就可以在这个方法中处理。下面先通过动态注册的方式编写一个能够监听网络变化的程序,借此学习一下BroadcastReceiver的基本用法。新建一个BroadcastTest项目,然后修改MainActivity中的代码,如下所示:
 
 ```Java
 public class MainActivity extends AppCompatActivity {
@@ -64,13 +68,15 @@ public class MainActivity extends AppCompatActivity {
 
 在MainActivity中定义了一个内部类NetworkChangeReceiver,这个类是继承自BroadcastReceiver的，并重写了父类的onReceive()方法。每当网络状态发生变化时，onReceive()方法就会得到执行，这里只是简单地使用Toast提示了一段文本信息。
 
-onCreate()方法，首先创建了个IntentFilter的实例，并给它添加了一个值为android.net.conn.CONNECTIVITY CHANGE的action,为什么要添加这个值呢？因为当网络状态发生变化时，系统发出的正是一条值为android.net.conn.CONNECTIVITY CHANGE的广播，也就是广播接收器想要监听什么广播，就在这里添加相应的action.。接下来创建了一个NetworkChangeReceiver的实例，然后调用registerReceiver()方法进行注册，将NetworkChangeReceiver的实例和IntentFilter的实例都传了进去，这样NetworkChange-Receiver就会收到所有值为android.net.conn.CONNECTIVITY_CHANGE的广播，也就实现了监听网络变化的功能。
+onCreate()方法，首先创建了个IntentFilter的实例，并给它添加了一个值为android.net.conn.CONNECTIVITY CHANGE的action,为什么要添加这个值呢？
+
+因为当网络状态发生变化时，系统发出的正是一条值为android.net.conn.CONNECTIVITY CHANGE的广播，也就是广播接收器想要监听什么广播，就在这里添加相应的action.。接下来创建了一个NetworkChangeReceiver的实例，然后调用registerReceiver()方法进行注册，将NetworkChangeReceiver的实例和IntentFilter的实例都传了进去，这样NetworkChange-Receiver就会收到所有值为android.net.conn.CONNECTIVITY_CHANGE的广播，也就实现了监听网络变化的功能。
 
 最后要记得，动态注册的广播接收器一定都要取消注册才行，这里我们是在onDestroy()方法中通过调用unregisterReceiver()方法来实现的。运行一下程序能准确地告诉用户当前是有网络还是没有网络。
 
 在onReceive()方法中，首先通过getSystemService()方法得到了ConnectivityManager的实例，这是一个**系统服务类**，专门用于管理网络连接的。然后调用它的getActiveNetwork-Info()方法可以得到NetworkInfo的实例，接着调用NetworkInfo的isAvailable()方法就可以判断出当前是否有网络了，最后我们还是通过Tost的方式对用户进行提示。
 
-另外，这里有非常重要的一点需要说明，Android系统为了保护用户设备的安全和隐私，做了严格的规定：如果程序需要进行一些对用户来说比较敏感的操作，就必须在配置文件中声明权限才可以，否则程序将会直接崩溃。比如这里访问系统的网络状态就是需要声明权限的。打开AndroidManifest..xml文件，在里面加入如下权限就可以访问系统网络状态了：
+另外，这里有非常重要的一点需要说明，Android系统为了保护用户设备的安全和隐私，做了严格的规定：如果程序需要进行一些对用户来说比较敏感的操作，就必须在配置文件中声明权限才可以，否则程序将会直接崩溃。比如这里访问系统的网络状态就是需要声明权限的。打开AndroidManifest.xml文件，在里面加入如下权限就可以访问系统网络状态了：
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -83,12 +89,18 @@ onCreate()方法，首先创建了个IntentFilter的实例，并给它添加了�
 
 ### 6.2.2 静态注册实现开机启动
 
-动态注册的广播接收器可以自由地控制注册与注销，在灵活性方面有很大的优势，但是它也存在着一个缺点，即必须要在程序启动之后才能接收到广播，因为注册的逻辑是写在onCreate()方法中的。那么有没有什么办法可以让程序在未启动的情况下就能接收到广播呢？这就需要使用静态注册的方式了。
+动态注册的广播接收器可以自由地控制注册与注销，在灵活性方面有很大的优势，但是它也存在着一个缺点，即**必须要在程序启动之后才能接收到广播**，因为注册的逻辑是写在onCreate()方法中的。
+
+**让程序在未启动的情况下就能接收到广播需要使用静态注册的方式。**
 这里我们准备让程序接收一条开机广播，当收到这条广播时就可以在onReceive()方法里执行相应的逻辑，从而实现开机启动的功能。可以使用Android Studio提供的快捷方式来创建一个广播接收器，右击com.example.broadcasttest包→New→Other→Broadcast Receiver,弹出如图窗口
 
 <img src="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/365/image-20220506184224577.png" alt="image-20220506184224577" style="zoom: 33%;" />
 
-将广播接收器命名为BootCompleteReceiver,Exported属性表示是否允许这个广播接收器接收本程序以外的广播，Enabled属性表示是否启用这个广播接收器。勾选这两个属性，点击Finish完成创建。
+将广播接收器命名为BootCompleteReceiver
+
+Exported属性表示是否允许这个广播接收器接收本程序以外的广播
+
+Enabled属性表示是否启用这个广播接收器。勾选这两个属性，点击Finish完成创建。
 然后修改BootCompleteReceiver中的代码，如下所示：
 
 ```Java
@@ -129,7 +141,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 </manifest>
 ```
 
-可以看到，<application>:标签内出现了一个新的标签<receiver>,所有静态的广播接收器都是在这里进行注册的。它的用法其实和<activity>标签非常相似，也是通过android:name来指定具体注册哪一个广播接收器，而enabled和exported属性则是根据我们刚才勾选的状态自动生成的。
+<application>:标签内出现了一个新的标签<receiver>,**所有静态的广播接收器都是在这里进行注册的**。它的用法其实和<activity>标签非常相似，也是通过android:name来指定具体注册哪一个广播接收器，而enabled和exported属性则是根据我们刚才勾选的状态自动生成的。
 不过目前BootCompleteReceiver还是不能接收到开机广播的，还需要对AndroidManifest.xml文件进行修改才行，如下所示：
 
 ```xml
@@ -160,13 +172,11 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 </manifest>
 ```
 
-由于Android系统启动完成后会发出一条值为android.intent.action.B00TC0 MPLETED的广播，因此在<intent-filter>标签里添加了相应的action。另外，监听系统开机广播也是需要声明权限的，可以看到，我们使用<uses-permission>标签又加人了一条android.permission.RECEIVE B00TC0 MPLETED权限。
+由于Android系统启动完成后会发出一条值为android.intent.action.BOOT_COMPLETED的广播，因此在<intent-filter>标签里添加了相应的action。另外，监听系统开机广播也是需要声明权限的，可以看到，我们使用<uses-permission>标签又加人了一条android.permission.RECEIVE B00TC0 MPLETED权限。
 
 重新运行程序。将模拟器关闭并重新启动。
 
-
-
-到目前为止，我们在广播接收器的onReceive()方法中都只是简单地使用Toast提示了一段文本信息，当你真正在项目中使用到它的时候，就可以在里面编写自己的逻辑。需要注意的是不要在onReceive()方法中添加过多的逻辑或者进行任何的耗时操作，因为在广播接收器中是不允许开启线程的，当onReceive()方法运行了较长时间而没有结束时，程序就会报错。因此广播接收器更多的是扮演一种打开程序其他组件的角色，比如创建一条状态栏通知，或者启动一个服务等，这几个概念我们会在后面的章节中学到。
+到目前为止在广播接收器的onReceive()方法中都只是简单地使用Toast提示了一段文本信息，使用的时候可以在里面编写自己的逻辑。需要注意的是**不要在onReceive()方法中添加过多的逻辑或者进行任何的耗时操作，因为在广播接收器中是不允许开启线程的，当onReceive()方法运行了较长时间而没有结束时，程序就会报错**。因此广播接收器更多的是扮演一种打开程序其他组件的角色，比如创建一条状态栏通知，或者启动一个服务等，这几个概念我们会在后面的章节中学到。
 
 ## 6.3 发送自定义广播
 
