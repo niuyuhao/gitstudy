@@ -538,11 +538,14 @@ public class MainActivity extends BaseActivity {
 }
 ```
 
-在按钮的点击事件里发送了一条广播,广播的值为com.example.broadcastbestpractice.FORCE_OFFLINE,这条广播就是用于通知程序强制用户下线的。也就是说,强制用户下线的逻辑并不是写在MainActivity里的,而是应该写在接收这条广播的BroadcastReceiver里。这样强制下线的功能就不会依附于任何界面了,不管是在程序的任何地方,只要发出这样一条广播,就可以完成强制下线的操作了。
+在按钮的点击事件里发送了一条广播,广播的值为com.example.broadcastbestpractice.FORCE_OFFLINE,这条广播就是用于通知程序强制用户下线的。也就是说,**强制用户下线的逻辑并不是写在MainActivity里的,而是应该写在接收这条广播的BroadcastReceiver里。**这样强制下线的功能就不会依附于任何界面了,不管是在程序的任何地方,只要发出这样一条广播,就可以完成强制下线的操作了。
 那么接下来就创建一个BroadcastReceiver来接收这条强制下线广播。
 
-问题,应该在哪里创建呢?由于BroadcastReceiver中需要弹出一个对话框来阻塞用户的正常操作,但如果创建的是一个静态注册的BroadcastReceiver,是没有办法在onReceive()方法里弹出对话框这样的UI控件的,而我们显然也不可能在每个Activity中都注册一个动态的BroadcastReceiver。
-需要在BaseActivity中动态注册一个BroadcastReceiver就可以了,因为所有的Activity都继承自BaseActivity。
+问题,应该在哪里创建呢?
+
+由于BroadcastReceiver中需要弹出一个对话框来阻塞用户的正常操作,但如果创建的是一个静态注册的BroadcastReceiver,是没有办法在onReceive()方法里弹出对话框这样的UI控件的,也不可能在每个Activity中都注册一个动态的BroadcastReceiver。
+
+所以需要在BaseActivity中动态注册一个BroadcastReceiver就可以了,因为所有的Activity都继承自BaseActivity。
 修改BaseActivity中的代码,如下所示:
 
 ```Java
@@ -601,7 +604,9 @@ public class BaseActivity extends AppCompatActivity {
 }
 ```
 
-先来看一下ForceOfflineReceiver中的代码,这次onReceive()方法里可不再是仅仅弹出一个Toast了,而是加入了较多的代码,那我们就来仔细看看吧。首先是使用AlertDialog.Builder构建一个对话框。注意,这里一定要调用setCancelable()方法将对话框设为不可取消,否则用户按一下Back键就可以关闭对话框继续使用程序了。然后使用setPositiveButton()方法给对话框注册确定按钮,当用户点击了“OK”按钮时,就调用ActivityCollector的finishAll()方法销毁所有Activity,并重新启动LoginActivity。
+先来看一下ForceOfflineReceiver中的代码,这次onReceive()方法里可不再是仅仅弹出一个Toast了,而是加入了较多的代码。
+
+首先是使用AlertDialog.Builder构建一个对话框。注意,这里一定要调用setCancelable()方法将对话框设为不可取消,否则用户按一下Back键就可以关闭对话框继续使用程序了。然后使用setPositiveButton()方法给对话框注册确定按钮,当用户点击了“OK”按钮时,就调用ActivityCollector的finishAll()方法销毁所有Activity,并重新启动LoginActivity。
 
 再来看一下是怎么注册ForceOfflineReceiver这个BroadcastReceiver的。可以看到,这里重写了onResume()和onPause()这两个生命周期方法,然后分别在这两个方法里注册和取消注册了ForceOfflineReceiver。
 
